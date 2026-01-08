@@ -1163,18 +1163,6 @@ if page == "Home":
                 <p style="color: #01579b; margin: 0;">Sleeping - Not Configured</p>
             </div>
             """, unsafe_allow_html=True)
-    
-    # Footer with robot theme
-    st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 10px; margin-top: 30px;">
-        <p style="font-size: 2em; margin: 10px 0;">🤖🦾🦿⚡</p>
-        <p style="font-size: 0.9em; color: #666; margin: 5px 0;">
-            <strong>Powered by Advanced AI Technology</strong><br>
-            Combining the power of Gemini, Claude, and OpenAI to deliver the best testing automation experience
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
 
 # Test Case Generator Page
 elif page == "Test Case Generator":
@@ -2200,5 +2188,13 @@ elif page == "AI Chat":
 
 # Footer (hide on AI Chat page - chat_input is fixed at bottom)
 if page != "AI Chat":
-    st.markdown('<div class="footer" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #e0e0e0;">RoboTest AI Suite | Powered by AI (Gemini, Claude & ChatGPT) | Copyright © 2026 Developed by Abdelrahman Kandil</div>', 
-                unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; padding: 15px; margin-top: 30px; border-top: 1px solid #e0e0e0;">
+        <p style="font-size: 0.9em; color: #666; margin: 5px 0;">
+            🤖🦾🦿⚡ <strong>RoboTest AI Suite</strong> | Powered by Gemini, Claude, OpenAI & GitHub Models
+        </p>
+        <p style="font-size: 0.8em; color: #999; margin: 5px 0;">
+            Copyright © 2026 | Developed by Abdelrahman Kandil
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
