@@ -22,6 +22,8 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")  # Claude API Key
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # GitHub PAT with models scope
+GITHUB_MODEL = os.getenv("GITHUB_MODEL", "openai/gpt-4o-mini")  # e.g., openai/gpt-4o, openai/gpt-4.1, or gpt-5 if available
 
 # Initialize Gemini client if available
 gemini_client = None
@@ -37,7 +39,7 @@ CLAUDE_MODEL = "claude-sonnet-4-20250514"  # Fast and intelligent model
 def call_ai(prompt, provider=None):
     """
     Call AI API with automatic fallback.
-    provider: "gemini", "openai", "claude", or "auto" (tries in order)
+    provider: "gemini", "openai", "claude", "github", or "auto" (tries in order)
     If not specified, uses the provider from session state
     """
     # Get provider from session state if not specified
@@ -45,7 +47,7 @@ def call_ai(prompt, provider=None):
         provider = st.session_state.get('ai_provider', 'auto')
     
     if provider == "auto":
-        # Try providers in order: Gemini -> Claude -> OpenAI
+        # Try providers in order: Gemini -> Claude -> OpenAI -> GitHub
         errors = []
         
         if GEMINI_API_KEY:
@@ -72,9 +74,15 @@ def call_ai(prompt, provider=None):
                 errors.append(f"OpenAI: {str(e)}")
                 raise e
         
+        if GITHUB_TOKEN:
+            try:
+                return call_github(prompt)
+            except Exception as e:
+                errors.append(f"GitHub: {str(e)}")
+        
         if errors:
             raise Exception(f"All providers failed. Errors: {'; '.join(errors)}")
-        raise Exception("No API keys configured. Please set at least one: GEMINI_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY")
+        raise Exception("No API keys configured. Please set at least one: GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, or GITHUB_TOKEN")
     
     elif provider == "gemini":
         return call_gemini(prompt)
@@ -82,6 +90,8 @@ def call_ai(prompt, provider=None):
         return call_openai(prompt)
     elif provider == "claude":
         return call_claude(prompt)
+    elif provider == "github":
+        return call_github(prompt)
     else:
         raise Exception(f"Unknown provider: {provider}")
 
@@ -160,9 +170,46 @@ def call_openai(prompt):
     
     return response.json()["choices"][0]["message"]["content"]
 
+def call_github(prompt):
+    """Call GitHub Models (Copilot) API"""
+    if not GITHUB_TOKEN:
+        raise Exception("GitHub token not configured. Add GITHUB_TOKEN to your .env file.")
+    
+    # Use selected model from session state if available, else use .env default
+    selected_model = st.session_state.get('github_model', GITHUB_MODEL)
+    
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": selected_model,
+        "messages": [
+            {"role": "system", "content": "You are an expert QA engineer with extensive experience in test automation and test planning."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+    response = requests.post(
+        "https://models.github.ai/inference/chat/completions",
+        headers=headers,
+        json=data
+    )
+    if response.status_code != 200:
+        try:
+            error_msg = response.json()
+        except Exception:
+            error_msg = response.text
+        raise Exception(f"GitHub Models API error: {error_msg}")
+    resp = response.json()
+    # GitHub Models returns choices/message/content similar to OpenAI
+    return resp.get("choices", [{}])[0].get("message", {}).get("content", "")
+
 # Check if at least one API key is available
-if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
-    st.error("⚠️ No API keys configured! Please set at least one of these in your .env file:\n- GEMINI_API_KEY\n- OPENAI_API_KEY\n- ANTHROPIC_API_KEY")
+if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY and not GITHUB_TOKEN:
+    st.error("⚠️ No AI providers configured! Please set at least one of these in your .env file:\n- GEMINI_API_KEY\n- OPENAI_API_KEY\n- ANTHROPIC_API_KEY\n- GITHUB_TOKEN (PAT with models scope)")
     st.stop()
 
 # Streamlit app configuration
@@ -832,15 +879,101 @@ if ANTHROPIC_API_KEY:
 if OPENAI_API_KEY:
     provider_options.append("OpenAI (ChatGPT)")
     provider_values.append("openai")
+if GITHUB_TOKEN:
+    provider_options.append("GitHub Models (Copilot)")
+    provider_values.append("github")
 
 selected_provider_idx = st.sidebar.selectbox(
     "Select AI Provider",
     range(len(provider_options)),
     format_func=lambda x: provider_options[x],
     index=0,
-    help="Auto mode tries providers in order: Gemini → Claude → OpenAI"
+    help="Auto mode tries providers in order: Gemini → Claude → OpenAI → GitHub"
 )
 st.session_state.ai_provider = provider_values[selected_provider_idx]
+
+# GitHub Models dropdown (shown when GitHub is selected)
+if st.session_state.ai_provider == "github":
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🤖 GitHub Model Selection")
+    
+    # List of all available GitHub Models
+    github_models = [
+        # OpenAI GPT Models
+        "openai/gpt-5",
+        "openai/gpt-5-chat",
+        "openai/gpt-5-mini",
+        "openai/gpt-5-nano",
+        "openai/gpt-4.1",
+        "openai/gpt-4.1-mini",
+        "openai/gpt-4.1-nano",
+        "openai/gpt-4o",
+        "openai/gpt-4o-mini",
+        # OpenAI Reasoning Models
+        "openai/o1",
+        "openai/o1-mini",
+        "openai/o1-preview",
+        "openai/o3",
+        "openai/o3-mini",
+        "openai/o4-mini",
+        # OpenAI Embedding Models
+        "openai/text-embedding-3-small",
+        "openai/text-embedding-3-large",
+        # Microsoft Phi Models
+        "microsoft/phi-4",
+        "microsoft/phi-4-mini-instruct",
+        "microsoft/phi-4-mini-reasoning",
+        "microsoft/phi-4-multimodal-instruct",
+        "microsoft/phi-4-reasoning",
+        "microsoft/phi-3-medium-128k-instruct",
+        "microsoft/phi-3-mini-128k-instruct",
+        # Microsoft Reasoning Models
+        "microsoft/mai-ds-r1",
+        # AI21 Labs Models
+        "ai21/jamba-1.5-large",
+        # Meta Llama Models
+        "meta/llama-4-scout-17b-16e-instruct",
+        "meta/llama-4-maverick-17b-128e-instruct-fp8",
+        "meta/llama-3.3-70b-instruct",
+        "meta/llama-3.2-90b-vision-instruct",
+        "meta/llama-3.2-11b-vision-instruct",
+        "meta/llama-3.1-405b-instruct",
+        "meta/llama-3.1-70b-instruct",
+        "meta/llama-3.1-8b-instruct",
+        # Cohere Models
+        "cohere/command-r-plus-08-2024",
+        "cohere/command-r-08-2024",
+        "cohere/command-a",
+        # Mistral AI Models
+        "mistralai/mistral-small-3.1",
+        "mistralai/codestral-25.01",
+        "mistralai/mistral-medium-3",
+        "mistralai/ministral-3b",
+        "mistralai/mistral-large",
+        "mistralai/mistral-nemo",
+        # DeepSeek Models
+        "deepseek/deepseek-v3-0324",
+        "deepseek/deepseek-r1-0528",
+        "deepseek/deepseek-r1",
+        # xAI Grok Models
+        "xai/grok-3",
+        "xai/grok-3-mini",
+        # Google Gemma Models
+        "google/gemma-2-27b-it",
+        "google/gemma-2-9b-it",
+    ]
+    
+    selected_model = st.sidebar.selectbox(
+        "Choose Model",
+        github_models,
+        index=github_models.index(GITHUB_MODEL) if GITHUB_MODEL in github_models else 0,
+        help="Select a model from the GitHub Models marketplace. Visit https://github.com/marketplace?type=models for available models."
+    )
+    
+    # Update session state with selected model
+    st.session_state.github_model = selected_model
+    
+    st.sidebar.info(f"📌 Selected: `{selected_model}`")
 
 # Show API status
 st.sidebar.markdown("**API Status:**")
@@ -856,6 +989,10 @@ if OPENAI_API_KEY:
     st.sidebar.markdown("✅ OpenAI API configured")
 else:
     st.sidebar.markdown("❌ OpenAI API not configured")
+if GITHUB_TOKEN:
+    st.sidebar.markdown("✅ GitHub Models configured")
+else:
+    st.sidebar.markdown("❌ GitHub Models not configured")
 
 st.sidebar.caption("💡 Add API keys to your `.env` file")
 

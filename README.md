@@ -29,9 +29,10 @@ This app leverages **multiple AI providers** with automatic fallback support, pr
 | **OpenAI** | gpt-4o-mini | Reliable, high-quality responses |
 | **Anthropic Claude** | claude-sonnet-4-20250514 | Intelligent, nuanced understanding |
 
-- **Auto-Fallback Mode:** Automatically tries providers in order (Gemini → Claude → OpenAI) if one fails or quota is exceeded
+- **Auto-Fallback Mode:** Automatically tries providers in order (Gemini → Claude → OpenAI → GitHub) if one fails or quota is exceeded
 - **Manual Selection:** Choose your preferred AI provider from the sidebar
 - **Multi-Provider Support:** Configure one or all API keys based on your needs
+- **GitHub Models (Copilot):** Use your GitHub PAT (`GITHUB_TOKEN`) and set `GITHUB_MODEL` (e.g., `openai/gpt-4o-mini` or `gpt-5` if available) to run models via GitHub Models API
 
 ---
 
@@ -140,16 +141,20 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 
 ```env
-# At least one API key is required
+# At least one provider is required
 GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
+# GitHub Models (Copilot)
+GITHUB_TOKEN=your_github_pat_with_models_scope
+GITHUB_MODEL=openai/gpt-4o-mini  # or gpt-5 if available to your org
 ```
 
 > **Note:** You need access to at least one AI provider:
 > - [Google Gemini API](https://makersuite.google.com/app/apikey)
 > - [OpenAI API](https://platform.openai.com/api-keys)
 > - [Anthropic API](https://console.anthropic.com/)
+> - [GitHub Models](https://docs.github.com/en/github-models/quickstart) (PAT with `models` scope)
 
 ### 4. Run the App
 
