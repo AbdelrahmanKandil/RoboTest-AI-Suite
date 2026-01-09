@@ -84,13 +84,17 @@ def get_google_auth_flow(redirect_uri=None):
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     
     # Try loading from secrets first (Deployment)
-    if "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]:
-        client_config = json.loads(st.secrets["google_oauth"]["json"])
-        return InstalledAppFlow.from_client_config(
-            client_config,
-            scopes=scopes,
-            redirect_uri=redirect_uri
-        )
+    try:
+        if "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]:
+            client_config = json.loads(st.secrets["google_oauth"]["json"])
+            return InstalledAppFlow.from_client_config(
+                client_config,
+                scopes=scopes,
+                redirect_uri=redirect_uri
+            )
+    except:
+        pass # Fallback to file if secrets missing
+
     
     # Fallback to file (Local)
     return InstalledAppFlow.from_client_secrets_file(
@@ -1285,7 +1289,13 @@ elif page == "Test Case Generator":
             st.info("Login to save test cases to Drive.")
             
             # Check if secrets or file exists
-            has_secrets = "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]
+            has_secrets = False
+            try:
+                if "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]:
+                    has_secrets = True
+            except:
+                pass
+                
             has_file = os.path.exists('client_secret.json')
             
             if has_secrets or has_file:
