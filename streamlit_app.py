@@ -79,6 +79,17 @@ def show_toast(message):
 def get_google_auth_flow(redirect_uri=None):
     """Create OAuth flow instance"""
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    
+    # Try loading from secrets first (Deployment)
+    if "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]:
+        client_config = json.loads(st.secrets["google_oauth"]["json"])
+        return InstalledAppFlow.from_client_config(
+            client_config,
+            scopes=scopes,
+            redirect_uri=redirect_uri
+        )
+    
+    # Fallback to file (Local)
     return InstalledAppFlow.from_client_secrets_file(
         'client_secret.json', 
         scopes=scopes,
@@ -1272,7 +1283,12 @@ elif page == "Test Case Generator":
 
         if not st.session_state.google_creds:
             st.info("Login to save test cases to Drive.")
-            if os.path.exists('client_secret.json'):
+            
+            # Check if secrets or file exists
+            has_secrets = "google_oauth" in st.secrets and "json" in st.secrets["google_oauth"]
+            has_file = os.path.exists('client_secret.json')
+            
+            if has_secrets or has_file:
                 # Checkbox for deployment context
                 # Default to Deployed URL (Cloud). Check this box only if running on localhost.
                 use_localhost = st.checkbox("Running on Localhost?", value=False, key="sidebar_localhost_check")
@@ -1285,7 +1301,7 @@ elif page == "Test Case Generator":
                 except Exception as e:
                     st.error(f"Config Error: {e}")
             else:
-                 st.warning("⚠️ `client_secret.json` missing.")
+                 st.warning("⚠️ Google Config missing (Secrets or client_secret.json).")
         else:
              st.success("✅ Connected to Google")
              if st.button("🚪 Logout", key="sidebar_logout"):
