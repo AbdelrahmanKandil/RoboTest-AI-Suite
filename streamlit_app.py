@@ -1274,8 +1274,9 @@ elif page == "Test Case Generator":
             st.info("Login to save test cases to Drive.")
             if os.path.exists('client_secret.json'):
                 # Checkbox for deployment context
-                is_deployed = st.checkbox("Using Deployed URL?", value=False, key="sidebar_deployed_check")
-                redirect_uri = DEPLOYED_REDIRECT_URI if is_deployed else LOCAL_REDIRECT_URI
+                # Default to Deployed URL (Cloud). Check this box only if running on localhost.
+                use_localhost = st.checkbox("Running on Localhost?", value=False, key="sidebar_localhost_check")
+                redirect_uri = LOCAL_REDIRECT_URI if use_localhost else DEPLOYED_REDIRECT_URI
                 
                 try:
                     flow = get_google_auth_flow(redirect_uri=redirect_uri)
