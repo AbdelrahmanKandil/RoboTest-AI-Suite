@@ -13,7 +13,13 @@ import tempfile
 from pathlib import Path
 import zipfile
 import time
+import time
 import requests
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 
 # Load environment variables
 load_dotenv()
@@ -31,6 +37,10 @@ st.set_page_config(
     }
 )
 
+
+
+
+
 # Configure AI Providers
 # Check session state for user-provided keys, otherwise use environment variables
 GEMINI_API_KEY = st.session_state.get("user_gemini_key", "") or os.getenv("GEMINI_API_KEY")
@@ -38,6 +48,88 @@ OPENAI_API_KEY = st.session_state.get("user_openai_key", "") or os.getenv("OPENA
 ANTHROPIC_API_KEY = st.session_state.get("user_anthropic_key", "") or os.getenv("ANTHROPIC_API_KEY")  # Claude API Key
 GITHUB_TOKEN = st.session_state.get("user_github_token", "") or os.getenv("GITHUB_TOKEN")  # GitHub PAT with models scope
 GITHUB_MODEL = os.getenv("GITHUB_MODEL", "openai/gpt-4o-mini")  # e.g., openai/gpt-4o, openai/gpt-4.1, or gpt-5 if available
+
+# --- Google OAuth Configuration ---
+# Update this with your deployed URL when pushing to production
+DEPLOYED_REDIRECT_URI = "https://robotest-ai-suite.streamlit.app"
+LOCAL_REDIRECT_URI = "http://localhost:8501"
+
+def show_toast(message):
+    """Show a toast notification"""
+    # Use streamlit toast if available (v1.28+) or custom html
+    try:
+        st.toast(message)
+    except:
+        st.markdown(f"""
+        <div class="toast">{message}</div>
+        <style>
+        .toast {{
+            position: fixed;
+            top: 5rem;
+            right: 1rem;
+            background-color: #2ecc71;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            z-index: 9999;
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+
+def get_google_auth_flow(redirect_uri=None):
+    """Create OAuth flow instance"""
+    scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    return InstalledAppFlow.from_client_secrets_file(
+        'client_secret.json', 
+        scopes=scopes,
+        redirect_uri=redirect_uri
+    )
+
+def handle_oauth_callback():
+    """Handle the OAuth callback from Google"""
+    if "code" in st.query_params:
+        try:
+            # Determine which URI was used (simple heuristic or try both)
+            # For simplicity, we try the one that matches current environment logic
+            # In a real app, you might store the expected URI in session state before redirect
+            
+            # Default to local for safety, or user configured
+            redirect_uri = LOCAL_REDIRECT_URI
+            
+            # Create Flow
+            flow = get_google_auth_flow(redirect_uri=redirect_uri)
+            
+            # Exchange code for token
+            flow.fetch_token(code=st.query_params["code"])
+            credentials = flow.credentials
+            
+            # Store in session state
+            st.session_state.google_creds = credentials
+            
+            # Clear the code from URL to prevent reprocessing
+            st.query_params.clear()
+            
+            # Set default page to Test Case Generator
+            # We use update to avoid 'modified after instantiation' if possible, 
+            # though here it's early in the script.
+            target_page = "🧪 Test Case Generator"
+            st.session_state.main_navigation = target_page
+            st.session_state.page = "Test Case Generator" 
+            # Force Widget Update
+            st.session_state["nav_radio_widget"] = target_page
+        
+            show_toast("✅ Successfully logged in with Google!")
+            time.sleep(1) # Allow toast to be seen
+            st.rerun()
+        except Exception as e:
+            st.error(f"Authentication Error: {str(e)}")
+            st.query_params.clear()
+
+# Run callback handler immediately
+handle_oauth_callback()
+
+# Initialize Gemini client if available
+
 
 # Initialize Gemini client if available
 gemini_client = None
@@ -882,14 +974,35 @@ div[data-testid="column"] > div > div > div > div.step-card:hover {
 st.sidebar.image("Sumergelogo.png", use_container_width=True)
 
 # Simple sidebar navigation - single click works
+# Simple sidebar navigation - single click works
 st.sidebar.markdown("### 🧭 Navigation")
 
-page = st.sidebar.radio(
-    "Select Page",
-    ["🏠 Home", "🧪 Test Case Generator", "🤖 Test Automation", "📋 Test Plan Generator", "💬 AI Chat"],
-    label_visibility="collapsed",
-    key="main_navigation"
-)
+nav_options = ["🏠 Home", "🧪 Test Case Generator", "🤖 Test Automation", "📋 Test Plan Generator", "💬 AI Chat"]
+
+# Determine index based on session state if available
+# CRITICAL FIX: Only set index if the widget key is NOT in session state.
+# If key is in session state (e.g. set by callback), let the widget use it.
+radio_kwargs = {
+    "label": "Select Page",
+    "options": nav_options,
+    "label_visibility": "collapsed",
+    "key": "nav_radio_widget"
+}
+
+if "nav_radio_widget" not in st.session_state:
+    default_index = 0
+    if "main_navigation" in st.session_state:
+        try:
+            default_index = nav_options.index(st.session_state.main_navigation)
+        except ValueError:
+            default_index = 0
+    radio_kwargs["index"] = default_index
+
+selected_option = st.sidebar.radio(**radio_kwargs)
+
+# Sync selection back to main_navigation (though we use selected_option primarily)
+st.session_state.main_navigation = selected_option
+page = selected_option
 
 # Remove emoji prefix for page matching
 page = page.split(" ", 1)[1] if " " in page else page
@@ -1137,12 +1250,7 @@ elif page == "Test Case Generator":
             help="When enabled, all form fields will be cleared after saving a test case",
             key="clear_fields_after_save"
         )
-        
-        st.markdown("---")
-        st.markdown("**About**")
-        st.markdown("Create professional test cases using AI")
-    
-        # Move API Configuration down, but keep it accessible if needed here or handle via main sidebar area logic
+                # Move API Configuration down, but keep it accessible if needed here or handle via main sidebar area logic
         # Ideally, general config should be global, but if specific to this page, keep here.
         # User requested moving these ABOVE the API provider. 
         # Since API provider is in the global sidebar (lines 875-1017), we need to restructure the global sidebar code
@@ -1155,14 +1263,46 @@ elif page == "Test Case Generator":
         # Let's remove this block from here and instead add it to the top global sidebar area or 
         # use `st.sidebar` order. Streamlit renders sidebar elements in order of execution.
         # Currently, global sidebar (nav & API) runs FIRST (lines 853-1017).
-        # This block runs only when page == "Test Case Generator".
+        # Google Sheets Authentication
+        st.markdown("---")
+        st.markdown("**☁️ Google Sheets**")
         
-        # To fix this, we need to restructure:
-        # 1. Navigation (Top)
-        # 2. Page Specific Settings (Middle) -> We need to move the API config code to run AFTER the page logic check.
-        # 3. API Config (Bottom)
+        if 'google_creds' not in st.session_state:
+            st.session_state.google_creds = None
+
+        if not st.session_state.google_creds:
+            st.info("Login to save test cases to Drive.")
+            if os.path.exists('client_secret.json'):
+                # Checkbox for deployment context
+                is_deployed = st.checkbox("Using Deployed URL?", value=False, key="sidebar_deployed_check")
+                redirect_uri = DEPLOYED_REDIRECT_URI if is_deployed else LOCAL_REDIRECT_URI
+                
+                try:
+                    flow = get_google_auth_flow(redirect_uri=redirect_uri)
+                    auth_url, _ = flow.authorization_url(prompt='consent')
+                    st.link_button("🔑 Login with Google", auth_url, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Config Error: {e}")
+            else:
+                 st.warning("⚠️ `client_secret.json` missing.")
+        else:
+             st.success("✅ Connected to Google")
+             if st.button("🚪 Logout", key="sidebar_logout"):
+                 st.session_state.google_creds = None
+                 st.rerun()
+                 
+        st.markdown("---")
+        st.markdown("**About**")
+        st.markdown("Create professional test cases using AI")
+    
 
     
+    st.title("Test Case Generator")
+    
+    # User Guidance for Google Sheets
+    if not st.session_state.get('google_creds'):
+        st.info("💡 **Tip**: To save your TestCases directly to Google Sheets, please **Login via the Sidebar** BEFORE creating your test case to avoid losing your work during the reload.")
+        
     tab1, tab2 = st.tabs(["Manual Creation", "Generate from Requirements"])
     
     with tab1:
@@ -1268,7 +1408,89 @@ elif page == "Test Case Generator":
                         show_toast("✅ Test case saved! Form cleared.")
                     else:
                         show_toast("✅ Test case saved successfully!")
+
+                    # Store for post-save actions
+                    st.session_state.last_saved_case = test_case
+                    st.session_state.reset_form = True
+                    st.rerun()
     
+
+        # Post-Save Options (Download / Upload to Drive)
+        if st.session_state.get('last_saved_case'):
+            ls_case = st.session_state.last_saved_case
+            st.success(f"Test Case '{ls_case['title']}' Saved Successfully!")
+            
+            ps_col1, ps_col2 = st.columns(2)
+            
+            with ps_col1:
+                # Prepare Excel for single case
+                single_df = pd.DataFrame([{
+                    'ID': ls_case['id'],
+                    'Title': ls_case['title'],
+                    'Priority': ls_case['priority'],
+                    'Preconditions': '\n'.join(ls_case['preconditions']),
+                    'Test Data': '\n'.join(ls_case.get('test_data', [])),
+                    'Test Steps': '\n'.join(ls_case['test_steps']),
+                    'Expected Results': '\n'.join(ls_case['expected_results'])
+                }])
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    single_df.to_excel(writer, index=False, sheet_name='Test Case')
+                output.seek(0)
+                
+                st.download_button(
+                    label="📥 Download as Excel",
+                    data=output,
+                    file_name=f"{ls_case['id']}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True,
+                    key="dl_single_excel"
+                )
+
+            with ps_col2:
+                # Check for Google Auth
+                if not st.session_state.get('google_creds'):
+                     st.warning("⚠️ To save to Google Sheets, please **Login** in the Sidebar.")
+                     st.caption("Logging in will reload the page, so do it *before* creating test cases.")
+                else:
+                    # Authenticated User
+                    sheet_name = st.text_input("Target Sheet Name", value="RoboTest Cases", key="target_sheet_name")
+                    
+                    if st.button("☁️ Save to Google Sheet", use_container_width=True, key="btn_save_gs"):
+                        try:
+                            # Authenticate gspread
+                            client = gspread.authorize(st.session_state.google_creds)
+                            
+                            # Open or Create Sheet
+                            try:
+                                sheet = client.open(sheet_name).sheet1
+                            except gspread.SpreadsheetNotFound:
+                                sh = client.create(sheet_name)
+                                sheet = sh.sheet1
+                                sheet.append_row(['ID', 'Title', 'Priority', 'Severity', 'Preconditions', 'Test Data', 'Test Steps', 'Expected Results'])
+                                
+                            # Prepare row
+                            row = [
+                                ls_case['id'],
+                                ls_case['title'],
+                                ls_case['priority'],
+                                ls_case.get('severity', 'Normal'),
+                                '\n'.join(ls_case['preconditions']),
+                                '\n'.join(ls_case.get('test_data', [])),
+                                '\n'.join(ls_case['test_steps']),
+                                '\n'.join(ls_case['expected_results'])
+                            ]
+                            
+                            sheet.append_row(row)
+                            st.success(f"✅ Saved to Google Sheet: {sheet_name}")
+                        except Exception as e:
+                            st.error(f"Failed to save to Google Sheet: {repr(e)}")
+                            # Do not auto-logout, let user see error
+                            # if "401" in str(e) or "403" in str(e):
+                            #    st.session_state.google_creds = None
+                            #    st.rerun()
+            st.markdown("---")
+            
     with tab2:
         st.subheader("Generate Test Cases from Requirements")
         
@@ -1376,7 +1598,12 @@ elif page == "Test Case Generator":
     if st.session_state.test_cases:
         st.subheader("Test Case Management")
         
-        # Export to Excel button
+        # Google Sheet Configuration for Bulk Actions
+        target_sheet_bulk = "RoboTest Cases"
+        if st.session_state.get('google_creds'):
+             target_sheet_bulk = st.text_input("Target Google Sheet", value="RoboTest Cases", key="bulk_sheet_name")
+
+        # Export to Excel button (All)
         excel_file = export_test_cases_to_excel(st.session_state.test_cases)
         st.download_button(
             label="📥 Export All Test Cases to Excel",
@@ -1423,15 +1650,69 @@ elif page == "Test Case Generator":
                                if st.session_state.get(f"select_{tc['id']}", False))
             
             if selected_count > 0:
-                if st.button(f"🚀 Generate Automation for {selected_count} Test Cases", key="gen_selected"):
-                    st.session_state.selected_test_cases = [
+                # Group buttons for selected actions
+                b_col1, b_col2, b_col3 = st.columns(3)
+                
+                selected_cases = [
                         tc for tc in st.session_state.test_cases 
                         if st.session_state.get(f"select_{tc['id']}", False)
                     ]
-                    st.session_state.main_navigation = "🤖 Test Automation"
-                    st.rerun()
+
+                with b_col1:
+                    if st.button(f"🚀 Automate ({selected_count})", key="gen_selected"):
+                        st.session_state.selected_test_cases = selected_cases
+                        st.session_state.main_navigation = "🤖 Test Automation"
+                        st.rerun()
+                
+                with b_col2:
+                    # Export Selected to Excel
+                    excel_selected = export_test_cases_to_excel(selected_cases)
+                    st.download_button(
+                        label=f"📥 Export ({selected_count}) to Excel",
+                        data=excel_selected,
+                        file_name=f"selected_test_cases_{selected_count}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True,
+                        key="export_selected_excel"
+                    )
+
+                with b_col3:
+                    # Save Selected to Google Sheet
+                    if st.session_state.get('google_creds'):
+                        if st.button(f"☁️ Save ({selected_count}) to Sheet", key="save_selected_gs"):
+                             try:
+                                client = gspread.authorize(st.session_state.google_creds)
+                                try:
+                                    sheet = client.open(target_sheet_bulk).sheet1
+                                except gspread.SpreadsheetNotFound:
+                                    sh = client.create(target_sheet_bulk)
+                                    sheet = sh.sheet1
+                                    sheet.append_row(['ID', 'Title', 'Priority', 'Severity', 'Preconditions', 'Test Data', 'Test Steps', 'Expected Results'])
+                                
+                                # Bulk prepare rows
+                                rows_to_append = []
+                                for tc in selected_cases:
+                                    rows_to_append.append([
+                                        tc['id'],
+                                        tc['title'],
+                                        tc['priority'],
+                                        tc.get('severity', 'Normal'),
+                                        '\n'.join(tc['preconditions']),
+                                        '\n'.join(tc.get('test_data', [])),
+                                        '\n'.join(tc['test_steps']),
+                                        '\n'.join(tc['expected_results'])
+                                    ])
+                                
+                                sheet.append_rows(rows_to_append)
+                                st.success(f"✅ Saved {selected_count} cases to '{target_sheet_bulk}'")
+                                time.sleep(2)
+                             except Exception as e:
+                                st.error(f"Failed: {e}")
+                    else:
+                         st.button(f"☁️ Save ({selected_count})", disabled=True, help="Login to Google first")
+
             else:
-                st.button("Generate Automation (Select Test Cases)", disabled=True)
+                st.info("Select test cases to perform bulk actions")
             
             # Delete selected button
             if st.button("🗑️ Delete Selected", key="delete_selected"):
@@ -1589,13 +1870,91 @@ elif page == "Test Case Generator":
                         "selected": test_case.get('selected', False)
                     }
                     st.session_state.editing_test_case = None
-                    show_toast("✅ Test case updated successfully!")
+                    show_toast("✅ Test case created/updated successfully!")
+                    
+                    # Store last saved case for post-save actions
+                    st.session_state.last_saved_case = st.session_state.test_cases[idx] if st.session_state.get('editing_test_case') else test_case
+                    
+                    st.session_state.editing_test_case = None
+                    st.session_state.reset_form = True # Flag to clear form on next run if needed
                     st.rerun()  # FIXED: Changed from experimental_rerun to rerun
             
             with col2:
                 if st.form_submit_button("Cancel", use_container_width=True):
                     st.session_state.editing_test_case = None
                     st.rerun()  # FIXED: Changed from experimental_rerun to rerun
+        
+        # Post-Save Options (Download / Upload to Drive)
+        if st.session_state.get('last_saved_case'):
+            ls_case = st.session_state.last_saved_case
+            st.success(f"Test Case '{ls_case['title']}' Saved Successfully!")
+            
+            ps_col1, ps_col2 = st.columns(2)
+            
+            with ps_col1:
+                # Prepare Excel for single case
+                single_df = pd.DataFrame([{
+                    'ID': ls_case['id'],
+                    'Title': ls_case['title'],
+                    'Priority': ls_case['priority'],
+                    'Preconditions': '\n'.join(ls_case['preconditions']),
+                    'Test Data': '\n'.join(ls_case.get('test_data', [])),
+                    'Test Steps': '\n'.join(ls_case['test_steps']),
+                    'Expected Results': '\n'.join(ls_case['expected_results'])
+                }])
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    single_df.to_excel(writer, index=False, sheet_name='Test Case')
+                output.seek(0)
+                
+                st.download_button(
+                    label="📥 Download as Excel",
+                    data=output,
+                    file_name=f"{ls_case['id']}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True,
+                    key="dl_single_excel"
+                )
+
+            with ps_col2:
+                if st.button("☁️ Save to Google Sheet", use_container_width=True, key="btn_save_gs"):
+                    if st.session_state.get('gs_creds') and st.session_state.get('gs_sheet_url'):
+                        try:
+                            # Authenticate
+                            scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+                            creds = Credentials.from_service_account_info(st.session_state.gs_creds, scopes=scope)
+                            client = gspread.authorize(creds)
+                            
+                            # Open sheet
+                            try:
+                                sheet = client.open_by_url(st.session_state.gs_sheet_url).sheet1
+                            except gspread.SpreadsheetNotFound:
+                                # Try opening by name
+                                sheet = client.open(st.session_state.gs_sheet_url).sheet1
+                                
+                            # Prepare row
+                            row = [
+                                ls_case['id'],
+                                ls_case['title'],
+                                ls_case['priority'],
+                                ls_case.get('severity', 'Normal'),
+                                '\n'.join(ls_case['preconditions']),
+                                '\n'.join(ls_case.get('test_data', [])),
+                                '\n'.join(ls_case['test_steps']),
+                                '\n'.join(ls_case['expected_results'])
+                            ]
+                            
+                            # Check headers and add if empty
+                            if not sheet.get_all_values():
+                                sheet.append_row(['ID', 'Title', 'Priority', 'Severity', 'Preconditions', 'Test Data', 'Test Steps', 'Expected Results'])
+                            
+                            sheet.append_row(row)
+                            st.success(f"✅ Saved to Google Sheet: {st.session_state.gs_sheet_url}")
+                        except Exception as e:
+                            st.error(f"Failed to save to Google Sheet: {str(e)}")
+                    else:
+                        st.warning("⚠️ Please configure Google Sheets credentials in the sidebar first.")
+            st.markdown("---")
 
 # Test Automation Page
 elif page == "Test Automation":
