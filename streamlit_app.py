@@ -100,12 +100,9 @@ def handle_oauth_callback():
     """Handle the OAuth callback from Google"""
     if "code" in st.query_params:
         try:
-            # Determine which URI was used (simple heuristic or try both)
-            # For simplicity, we try the one that matches current environment logic
-            # In a real app, you might store the expected URI in session state before redirect
-            
-            # Default to local for safety, or user configured
-            redirect_uri = LOCAL_REDIRECT_URI
+            # Determine which URI was used
+            # Try to get from session state, otherwise default to DEPLOYED (Cloud)
+            redirect_uri = st.session_state.get("oauth_redirect_uri", DEPLOYED_REDIRECT_URI)
             
             # Create Flow
             flow = get_google_auth_flow(redirect_uri=redirect_uri)
@@ -1293,6 +1290,7 @@ elif page == "Test Case Generator":
                 # Default to Deployed URL (Cloud). Check this box only if running on localhost.
                 use_localhost = st.checkbox("Running on Localhost?", value=False, key="sidebar_localhost_check")
                 redirect_uri = LOCAL_REDIRECT_URI if use_localhost else DEPLOYED_REDIRECT_URI
+                st.session_state["oauth_redirect_uri"] = redirect_uri
                 
                 try:
                     flow = get_google_auth_flow(redirect_uri=redirect_uri)
