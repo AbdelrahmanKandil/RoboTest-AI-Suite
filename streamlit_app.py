@@ -24,6 +24,9 @@ from google.auth.transport.requests import Request
 # Load environment variables
 load_dotenv()
 
+# Relax OAuth scope validation (Google adds openid/email/profile automatically)
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
 # Streamlit app configuration
 st.set_page_config(
     page_title="RoboTest AI Suite",
