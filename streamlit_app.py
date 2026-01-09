@@ -167,11 +167,6 @@ handle_oauth_callback()
 # Initialize Gemini client if available
 
 
-# Initialize Gemini client if available
-gemini_client = None
-if GEMINI_API_KEY:
-    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-
 # Model Configuration
 GEMINI_MODEL = "models/gemini-flash-latest"
 OPENAI_MODEL = "gpt-4o-mini"  # Cost-effective model, change to "gpt-4o" for better quality
@@ -239,9 +234,14 @@ def call_ai(prompt, provider=None):
 
 def call_gemini(prompt):
     """Call Gemini API"""
-    if not gemini_client:
+    # Get current API key from session state or env
+    current_key = st.session_state.get("user_gemini_key", "") or os.getenv("GEMINI_API_KEY")
+    if not current_key:
         raise Exception("Gemini API key not configured")
-    response = gemini_client.models.generate_content(
+    
+    # Create client with current key
+    client = genai.Client(api_key=current_key)
+    response = client.models.generate_content(
         model=GEMINI_MODEL,
         contents=prompt
     )
