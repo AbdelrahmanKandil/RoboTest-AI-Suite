@@ -1296,8 +1296,13 @@ elif page == "Test Case Generator":
                 
                 try:
                     flow = get_google_auth_flow(redirect_uri=redirect_uri)
-                    auth_url, _ = flow.authorization_url(prompt='consent')
+                    auth_url, _ = flow.authorization_url(
+                        prompt='consent', 
+                        access_type='offline',
+                        include_granted_scopes='true'
+                    )
                     st.link_button("🔑 Login with Google", auth_url, use_container_width=True)
+                    st.caption(f"Redirecting to: `{redirect_uri}`")
                 except Exception as e:
                     st.error(f"Config Error: {e}")
             else:
