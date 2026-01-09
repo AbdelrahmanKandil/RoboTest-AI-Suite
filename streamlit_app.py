@@ -1444,7 +1444,147 @@ page = selected_option
 page = page.split(" ", 1)[1] if " " in page else page
 
 # AI Provider Configuration in Sidebar
-# API Configuration moved to only show on Home page (see end of file)
+# Only show provider selection on Home page
+if page == "Home":
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### ⚙️ AI Provider")
+
+    # Build provider map for labels
+    provider_map = {"auto": "Auto (Recommended)"}
+    provider_values = ["auto"]
+    
+    if GEMINI_API_KEY:
+        provider_map["gemini"] = "Google Gemini"
+        provider_values.append("gemini")
+    if ANTHROPIC_API_KEY:
+        provider_map["claude"] = "Claude (Anthropic)"
+        provider_values.append("claude")
+    if OPENAI_API_KEY:
+        provider_map["openai"] = "OpenAI (ChatGPT)"
+        provider_values.append("openai")
+    if GITHUB_TOKEN:
+        provider_map["github"] = "GitHub Models (Copilot)"
+        provider_values.append("github")
+
+    # Ensure current provider is valid
+    if st.session_state.get("ai_provider") not in provider_values:
+        st.session_state.ai_provider = "auto"
+
+    # Native State Binding: key="ai_provider" auto-updates session state
+    st.sidebar.selectbox(
+        "Select AI Provider",
+        provider_values,
+        format_func=lambda x: provider_map.get(x, x),
+        key="ai_provider",
+        help="Auto mode tries providers in order: Gemini → Claude → OpenAI → GitHub"
+    )
+    
+    # Update model provider label for dashboard display immediately
+    st.session_state.model_provider = provider_map.get(st.session_state.ai_provider, "Auto")
+
+    # GitHub Models dropdown (shown when GitHub is selected)
+    if st.session_state.ai_provider == "github":
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("### 🤖 GitHub Model Selection")
+        
+        # List of all available GitHub Models
+        github_models = [
+            # OpenAI GPT Models
+            "openai/gpt-5",
+            "openai/gpt-5-chat",
+            "openai/gpt-5-mini",
+            "openai/gpt-5-nano",
+            "openai/gpt-4.1",
+            "openai/gpt-4.1-mini",
+            "openai/gpt-4.1-nano",
+            "openai/gpt-4o",
+            "openai/gpt-4o-mini",
+            # OpenAI Reasoning Models
+            "openai/o1",
+            "openai/o1-mini",
+            "openai/o1-preview",
+            "openai/o3",
+            "openai/o3-mini",
+            "openai/o4-mini",
+            # OpenAI Embedding Models
+            "openai/text-embedding-3-small",
+            "openai/text-embedding-3-large",
+            # Microsoft Phi Models
+            "microsoft/phi-4",
+            "microsoft/phi-4-mini-instruct",
+            "microsoft/phi-4-mini-reasoning",
+            "microsoft/phi-4-multimodal-instruct",
+            "microsoft/phi-4-reasoning",
+            "microsoft/phi-3-medium-128k-instruct",
+            "microsoft/phi-3-mini-128k-instruct",
+            # Microsoft Reasoning Models
+            "microsoft/mai-ds-r1",
+            # AI21 Labs Models
+            "ai21/jamba-1.5-large",
+            # Meta Llama Models
+            "meta/llama-4-scout-17b-16e-instruct",
+            "meta/llama-4-maverick-17b-128e-instruct-fp8",
+            "meta/llama-3.3-70b-instruct",
+            "meta/llama-3.2-90b-vision-instruct",
+            "meta/llama-3.2-11b-vision-instruct",
+            "meta/llama-3.1-405b-instruct",
+            "meta/llama-3.1-70b-instruct",
+            "meta/llama-3.1-8b-instruct",
+            # Cohere Models
+            "cohere/command-r-plus-08-2024",
+            "cohere/command-r-08-2024",
+            "cohere/command-a",
+            # Mistral AI Models
+            "mistralai/mistral-small-3.1",
+            "mistralai/codestral-25.01",
+            "mistralai/mistral-medium-3",
+            "mistralai/ministral-3b",
+            "mistralai/mistral-large",
+            "mistralai/mistral-nemo",
+            # DeepSeek Models
+            "deepseek/deepseek-v3-0324",
+            "deepseek/deepseek-r1-0528",
+            "deepseek/deepseek-r1",
+            # xAI Grok Models
+            "xai/grok-3",
+            "xai/grok-3-mini",
+            # Google Gemma Models
+            "google/gemma-2-27b-it",
+            "google/gemma-2-9b-it",
+        ]
+        
+        selected_model = st.sidebar.selectbox(
+            "Choose Model",
+            github_models,
+            index=github_models.index(GITHUB_MODEL) if GITHUB_MODEL in github_models else 0,
+            help="Select a model from the GitHub Models marketplace. Visit https://github.com/marketplace?type=models for available models."
+        )
+        
+        # Update session state with selected model
+        st.session_state.github_model = selected_model
+        
+        st.sidebar.info(f"📌 Selected: `{selected_model}`")
+
+    # Show API status
+    st.sidebar.markdown("**API Status:**")
+    if GEMINI_API_KEY:
+        st.sidebar.markdown("✅ Gemini API configured")
+    else:
+        st.sidebar.markdown("❌ Gemini API not configured")
+    if ANTHROPIC_API_KEY:
+        st.sidebar.markdown("✅ Claude API configured")
+    else:
+        st.sidebar.markdown("❌ Claude API not configured")
+    if OPENAI_API_KEY:
+        st.sidebar.markdown("✅ OpenAI API configured")
+    else:
+        st.sidebar.markdown("❌ OpenAI API not configured")
+    if GITHUB_TOKEN:
+        st.sidebar.markdown("✅ GitHub Models configured")
+    else:
+        st.sidebar.markdown("❌ GitHub Models not configured")
+
+    st.sidebar.caption("💡 Add API keys to your `.env` file")
 
 # Home Page
 if page == "Home":
@@ -1487,9 +1627,7 @@ if page == "Home":
                  script_count = sum(len(v) for v in st.session_state.automation_code.values())
         st.metric("Scripts Generated", script_count, help="Automation scripts generated")
     with dash_col3:
-        provider_key = st.session_state.get('ai_provider', 'auto')
-        display_map = {"auto": "Auto (Smart)", "gemini": "Google Gemini", "openai": "OpenAI GPT-4", "claude": "Anthropic Claude", "github": "GitHub Models"}
-        st.metric("Active AI Model", display_map.get(provider_key, provider_key.capitalize()), help="Current AI provider")
+        st.metric("Active AI Model", st.session_state.get('model_provider', 'Gemini'), help="Current AI provider")
     with dash_col4:
         st.metric("Bug Reports", st.session_state.get('bug_reports_count', 0), help="Bug reports generated in this session")
     
@@ -3814,142 +3952,5 @@ with st.sidebar.expander("🔑 API Configuration", expanded=False):
     st.text_input("Anthropic API Key", key="user_anthropic_key", type="password", help="Overrides ANTHROPIC_API_KEY from .env")
     st.text_input("GitHub Token", key="user_github_token", type="password", help="Overrides GITHUB_TOKEN from .env")
 
-# Only show provider selection on Home page
-if page == "Home":
 
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### ⚙️ AI Provider")
 
-    # Build provider options based on available API keys
-    provider_options = ["Auto (Recommended)"]
-    provider_values = ["auto"]
-    if GEMINI_API_KEY:
-        provider_options.append("Google Gemini")
-        provider_values.append("gemini")
-    if ANTHROPIC_API_KEY:
-        provider_options.append("Claude (Anthropic)")
-        provider_values.append("claude")
-    if OPENAI_API_KEY:
-        provider_options.append("OpenAI (ChatGPT)")
-        provider_values.append("openai")
-    if GITHUB_TOKEN:
-        provider_options.append("GitHub Models (Copilot)")
-        provider_values.append("github")
-
-    # Ensure provider is valid (in case keys changed)
-    current_provider_idx = 0
-    if st.session_state.ai_provider in provider_values:
-        current_provider_idx = provider_values.index(st.session_state.ai_provider)
-
-    selected_provider_idx = st.sidebar.selectbox(
-        "Select AI Provider",
-        range(len(provider_options)),
-        format_func=lambda x: provider_options[x],
-        index=current_provider_idx,
-        help="Auto mode tries providers in order: Gemini → Claude → OpenAI → GitHub"
-    )
-    st.session_state.ai_provider = provider_values[selected_provider_idx]
-
-    # GitHub Models dropdown (shown when GitHub is selected)
-    if st.session_state.ai_provider == "github":
-        st.sidebar.markdown("---")
-        st.sidebar.markdown("### 🤖 GitHub Model Selection")
-        
-        # List of all available GitHub Models
-        github_models = [
-            # OpenAI GPT Models
-            "openai/gpt-5",
-            "openai/gpt-5-chat",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "openai/gpt-4.1",
-            "openai/gpt-4.1-mini",
-            "openai/gpt-4.1-nano",
-            "openai/gpt-4o",
-            "openai/gpt-4o-mini",
-            # OpenAI Reasoning Models
-            "openai/o1",
-            "openai/o1-mini",
-            "openai/o1-preview",
-            "openai/o3",
-            "openai/o3-mini",
-            "openai/o4-mini",
-            # OpenAI Embedding Models
-            "openai/text-embedding-3-small",
-            "openai/text-embedding-3-large",
-            # Microsoft Phi Models
-            "microsoft/phi-4",
-            "microsoft/phi-4-mini-instruct",
-            "microsoft/phi-4-mini-reasoning",
-            "microsoft/phi-4-multimodal-instruct",
-            "microsoft/phi-4-reasoning",
-            "microsoft/phi-3-medium-128k-instruct",
-            "microsoft/phi-3-mini-128k-instruct",
-            # Microsoft Reasoning Models
-            "microsoft/mai-ds-r1",
-            # AI21 Labs Models
-            "ai21/jamba-1.5-large",
-            # Meta Llama Models
-            "meta/llama-4-scout-17b-16e-instruct",
-            "meta/llama-4-maverick-17b-128e-instruct-fp8",
-            "meta/llama-3.3-70b-instruct",
-            "meta/llama-3.2-90b-vision-instruct",
-            "meta/llama-3.2-11b-vision-instruct",
-            "meta/llama-3.1-405b-instruct",
-            "meta/llama-3.1-70b-instruct",
-            "meta/llama-3.1-8b-instruct",
-            # Cohere Models
-            "cohere/command-r-plus-08-2024",
-            "cohere/command-r-08-2024",
-            "cohere/command-a",
-            # Mistral AI Models
-            "mistralai/mistral-small-3.1",
-            "mistralai/codestral-25.01",
-            "mistralai/mistral-medium-3",
-            "mistralai/ministral-3b",
-            "mistralai/mistral-large",
-            "mistralai/mistral-nemo",
-            # DeepSeek Models
-            "deepseek/deepseek-v3-0324",
-            "deepseek/deepseek-r1-0528",
-            "deepseek/deepseek-r1",
-            # xAI Grok Models
-            "xai/grok-3",
-            "xai/grok-3-mini",
-            # Google Gemma Models
-            "google/gemma-2-27b-it",
-            "google/gemma-2-9b-it",
-        ]
-        
-        selected_model = st.sidebar.selectbox(
-            "Choose Model",
-            github_models,
-            index=github_models.index(GITHUB_MODEL) if GITHUB_MODEL in github_models else 0,
-            help="Select a model from the GitHub Models marketplace. Visit https://github.com/marketplace?type=models for available models."
-        )
-        
-        # Update session state with selected model
-        st.session_state.github_model = selected_model
-        
-        st.sidebar.info(f"📌 Selected: `{selected_model}`")
-
-    # Show API status
-    st.sidebar.markdown("**API Status:**")
-    if GEMINI_API_KEY:
-        st.sidebar.markdown("✅ Gemini API configured")
-    else:
-        st.sidebar.markdown("❌ Gemini API not configured")
-    if ANTHROPIC_API_KEY:
-        st.sidebar.markdown("✅ Claude API configured")
-    else:
-        st.sidebar.markdown("❌ Claude API not configured")
-    if OPENAI_API_KEY:
-        st.sidebar.markdown("✅ OpenAI API configured")
-    else:
-        st.sidebar.markdown("❌ OpenAI API not configured")
-    if GITHUB_TOKEN:
-        st.sidebar.markdown("✅ GitHub Models configured")
-    else:
-        st.sidebar.markdown("❌ GitHub Models not configured")
-
-    st.sidebar.caption("💡 Add API keys to your `.env` file")
