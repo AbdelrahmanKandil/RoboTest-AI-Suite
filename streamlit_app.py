@@ -105,17 +105,38 @@ def get_google_auth_flow(redirect_uri=None):
 
 def handle_oauth_callback():
     """Handle the OAuth callback from Google"""
+    # Prevent re-using code if already logged in
+    if st.session_state.get("google_creds"):
+        if "code" in st.query_params:
+            st.query_params.clear()
+        return
+
     if "code" in st.query_params:
         try:
-            # Determine which URI was used
-            # Try to get from session state, otherwise default to DEPLOYED (Cloud)
-            redirect_uri = st.session_state.get("oauth_redirect_uri", DEPLOYED_REDIRECT_URI)
+            # 1. Try to get from session state
+            redirect_uri = st.session_state.get("oauth_redirect_uri")
+            
+            # 2. If session state lost, infer from environment
+            if not redirect_uri:
+                # Heuristic: If we can access st.secrets, we are likely on Cloud
+                try:
+                    # Check for secrets existence (will fail locally if no secrets.toml)
+                    if "google_oauth" in st.secrets:
+                        redirect_uri = DEPLOYED_REDIRECT_URI
+                    else:
+                        redirect_uri = LOCAL_REDIRECT_URI
+                except:
+                    # Exception means no secrets file -> Localhost
+                    redirect_uri = LOCAL_REDIRECT_URI
+            
+            # st.write(f"Debug: Using URI {redirect_uri}")
             
             # Create Flow
             flow = get_google_auth_flow(redirect_uri=redirect_uri)
             
             # Exchange code for token
             flow.fetch_token(code=st.query_params["code"])
+            
             credentials = flow.credentials
             
             # Store in session state
@@ -125,8 +146,6 @@ def handle_oauth_callback():
             st.query_params.clear()
             
             # Set default page to Test Case Generator
-            # We use update to avoid 'modified after instantiation' if possible, 
-            # though here it's early in the script.
             target_page = "🧪 Test Case Generator"
             st.session_state.main_navigation = target_page
             st.session_state.page = "Test Case Generator" 
@@ -138,6 +157,8 @@ def handle_oauth_callback():
             st.rerun()
         except Exception as e:
             st.error(f"Authentication Error: {str(e)}")
+            # Do not clear params immediately so user can see error? 
+            # Actually better to clear to avoid loops
             st.query_params.clear()
 
 # Run callback handler immediately
