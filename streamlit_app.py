@@ -1487,7 +1487,9 @@ if page == "Home":
                  script_count = sum(len(v) for v in st.session_state.automation_code.values())
         st.metric("Scripts Generated", script_count, help="Automation scripts generated")
     with dash_col3:
-        st.metric("Active AI Model", st.session_state.get('model_provider', 'Gemini'), help="Current AI provider")
+        provider_key = st.session_state.get('ai_provider', 'auto')
+        display_map = {"auto": "Auto (Smart)", "gemini": "Google Gemini", "openai": "OpenAI GPT-4", "claude": "Anthropic Claude", "github": "GitHub Models"}
+        st.metric("Active AI Model", display_map.get(provider_key, provider_key.capitalize()), help="Current AI provider")
     with dash_col4:
         st.metric("Bug Reports", st.session_state.get('bug_reports_count', 0), help="Bug reports generated in this session")
     
