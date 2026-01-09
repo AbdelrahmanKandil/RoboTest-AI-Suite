@@ -781,9 +781,11 @@ def generate_test_case_automation_code(test_case, use_pom=True, use_oop=True, us
             design_instructions.append("- Combine @FindBy for static elements with By-based lookups in actions and waits")
             design_instructions.append("- Prefer stable CSS/XPath strategies; avoid brittle absolute XPaths; include meaningful locator names")
         if use_oop:
-            design_instructions.append("- Object-Oriented Programming principles (Encapsulation, Inheritance, Polymorphism)")
-            design_instructions.append("- Use inheritance with BaseTest and BasePage classes")
-            design_instructions.append("- Apply SOLID principles")
+            design_instructions.append("- Object-Oriented Programming (OOP) & SOLID Principles")
+            design_instructions.append("- Inheritance: Use BaseTest and BasePage classes")
+            design_instructions.append("- Component Objects: Create reusable components (Table, Navbar) extending BaseComponent")
+            design_instructions.append("- Fluent Interfaces: Method chaining for actions (e.g., login.enterUser().enterPass().clickSubmit())")
+            design_instructions.append("- Encapsulation: Private WebElements, public action methods")
         if use_data_driven:
             design_instructions.append("- Data-driven testing with @DataProvider")
             design_instructions.append("- External test data from JSON/Excel files")
@@ -791,12 +793,18 @@ def generate_test_case_automation_code(test_case, use_pom=True, use_oop=True, us
             design_instructions.append("- BDD style with descriptive method names")
             design_instructions.append("- Given-When-Then comments in test methods")
         if use_bot_style:
-            design_instructions.append("- Bot Style Architecture Pattern")
-            design_instructions.append("- Create a Bot class that encapsulates all user actions")
-            design_instructions.append("- Fluent/chainable API for method chaining (return this)")
-            design_instructions.append("- Bot methods should be action-oriented like: bot.login(user, pass).navigateTo(page).clickButton(name)")
-            design_instructions.append("- Separate Bot class from Page Objects for reusable action sequences")
-            design_instructions.append("- Bot should handle common workflows and complex user journeys")
+            design_instructions.append("- Action-Based Testing (Bot Style)")
+            design_instructions.append("- Create an ActionBot class that abstracts all WebDriver actions")
+            design_instructions.append("- Bot methods should be generic: click(locator), type(locator, text), isDisplayed(locator), waitForElement(locator)")
+            design_instructions.append("- Page classes should use the Bot for all interactions, not WebDriver directly")
+            design_instructions.append("- This abstracts Selenium logic away from Page Objects")
+
+        # Critical Enhancements (From Enhancement Guide)
+        design_instructions.append("- Explicit Waits: Use WebDriverWait with ExpectedConditions. NEVER use Thread.sleep().")
+        design_instructions.append("- Logging: Use SLF4J/Log4j2. Log INFO for flow, DEBUG for actions, ERROR for failures.")
+        design_instructions.append("- Test Isolation: Use @BeforeMethod for setup and @AfterMethod for teardown. No shared state.")
+        design_instructions.append("- Exception Handling: Wrap actions in try-catch, capture screenshots on failure, log stack traces.")
+        design_instructions.append("- Locator Strategy: Priority ID > Name > CSS. Avoid absolute XPath. Use data-testid if available.")
         
         if not use_pom and not use_oop and not use_bot_style:
             design_instructions.append("- Simple linear test script without Page Object Model")
@@ -868,9 +876,11 @@ def generate_combined_automation_code(test_cases, use_pom=True, use_oop=True, us
             design_instructions.append("- Combine @FindBy for static elements with By-based lookups in actions and waits")
             design_instructions.append("- Prefer stable CSS/XPath strategies; avoid brittle absolute XPaths; include meaningful locator names")
         if use_oop:
-            design_instructions.append("- Object-Oriented Programming principles (Encapsulation, Inheritance, Polymorphism)")
-            design_instructions.append("- Use inheritance with BaseTest and BasePage classes")
-            design_instructions.append("- Apply SOLID principles")
+            design_instructions.append("- Object-Oriented Programming (OOP) & SOLID Principles")
+            design_instructions.append("- Inheritance: Use BaseTest and BasePage classes")
+            design_instructions.append("- Component Objects: Create reusable components (Table, Navbar) extending BaseComponent")
+            design_instructions.append("- Fluent Interfaces: Method chaining for actions (e.g., login.enterUser().enterPass().clickSubmit())")
+            design_instructions.append("- Encapsulation: Private WebElements, public action methods")
         if use_data_driven:
             design_instructions.append("- Data-driven testing with @DataProvider")
             design_instructions.append("- External test data from JSON/Excel files")
@@ -878,12 +888,18 @@ def generate_combined_automation_code(test_cases, use_pom=True, use_oop=True, us
             design_instructions.append("- BDD style with descriptive method names")
             design_instructions.append("- Given-When-Then comments in test methods")
         if use_bot_style:
-            design_instructions.append("- Bot Style Architecture Pattern")
-            design_instructions.append("- Create a Bot class that encapsulates all user actions")
-            design_instructions.append("- Fluent/chainable API for method chaining (return this)")
-            design_instructions.append("- Bot methods should be action-oriented like: bot.login(user, pass).navigateTo(page).clickButton(name)")
-            design_instructions.append("- Separate Bot class from Page Objects for reusable action sequences")
-            design_instructions.append("- Bot should handle common workflows and complex user journeys")
+            design_instructions.append("- Action-Based Testing (Bot Style)")
+            design_instructions.append("- Create an ActionBot class that abstracts all WebDriver actions")
+            design_instructions.append("- Bot methods should be generic and handle waits/exceptions: bot.click(locator), bot.type(locator, text)")
+            design_instructions.append("- Use the ActionBot in Page classes to handle element interactions")
+            design_instructions.append("- Ensure Test classes focus on business logic, Page classes on element structure, and Bot on WebDriver commands")
+
+        # Critical Enhancements (From Enhancement Guide)
+        design_instructions.append("- Explicit Waits: Use WebDriverWait with ExpectedConditions. NEVER use Thread.sleep().")
+        design_instructions.append("- Logging: Use SLF4J/Log4j2. Log INFO for flow, DEBUG for actions, ERROR for failures.")
+        design_instructions.append("- Test Isolation: Use @BeforeMethod for setup and @AfterMethod for teardown. No shared state.")
+        design_instructions.append("- Exception Handling: Wrap actions in try-catch, capture screenshots on failure, log stack traces.")
+        design_instructions.append("- Locator Strategy: Priority ID > Name > CSS. Avoid absolute XPath. Use data-testid if available.")
         
         if not use_pom and not use_oop and not use_bot_style:
             design_instructions.append("- Simple linear test script without Page Object Model")
@@ -953,6 +969,373 @@ def parse_generated_code(code):
     
     return files
 
+# Function to detect test type from test case content
+def detect_test_type(test_case):
+    """
+    Auto-detect test type from title and steps
+    Returns: 'ui', 'api', 'unit_spec', or 'mixed'
+    """
+    title_lower = test_case.get('title', '').lower()
+    steps_text = ' '.join(test_case.get('test_steps', [])).lower()
+    combined_text = title_lower + ' ' + steps_text
+    
+    # Check for API indicators
+    api_keywords = ['api', 'endpoint', 'request', 'response', 'json', 'rest', 'http', 'post', 'get', 'put', 'delete', 'status code', 'payload']
+    if any(word in combined_text for word in api_keywords):
+        return 'api'
+    
+    # Check for unit test indicators
+    unit_keywords = ['function', 'method', 'class', 'unit', 'component', 'module', 'service', 'repository', 'controller', 'calculate', 'validate', 'parse']
+    if any(word in combined_text for word in unit_keywords):
+        return 'unit_spec'
+    
+    # Check for UI indicators
+    ui_keywords = ['click', 'navigate', 'button', 'page', 'ui', 'screen', 'form', 'input', 'field', 'dropdown', 'checkbox', 'login', 'submit', 'display', 'verify']
+    if any(word in combined_text for word in ui_keywords):
+        return 'ui'
+    
+    return 'ui'  # Default to UI if unsure
+
+# Function to learn patterns from example test cases
+def learn_from_examples(example_contents):
+    """
+    Analyze test case examples and extract writing patterns
+    Returns learned rules as structured data
+    """
+    try:
+        examples_text = "\n\n---\n\n".join(example_contents)
+        
+        prompt = f"""
+        You are an expert QA analyst. Analyze the following test case examples and extract the writing patterns and style.
+        
+        EXAMPLES:
+        {examples_text}
+        
+        Analyze and return a JSON object with the following structure:
+        {{
+            "id_format": "The ID format pattern (e.g., TC-001, TC_MODULE_001)",
+            "title_style": "Description of title writing style",
+            "precondition_style": "How preconditions are written (numbered, bulleted, etc.)",
+            "steps_style": "How steps are written (verb usage, numbering, detail level)",
+            "expected_results_style": "How expected results are written",
+            "common_fields": ["List of common fields used"],
+            "priority_values": ["Priority values used"],
+            "tone": "Formal/Informal/Technical",
+            "special_patterns": ["Any unique patterns noticed"],
+            "summary": "Brief summary of the overall writing style"
+        }}
+        
+        Return ONLY the JSON object, no additional text.
+        """
+        
+        response_text = call_ai(prompt)
+        json_match = re.search(r'\{[\s\S]*\}', response_text)
+        if json_match:
+            return json.loads(json_match.group())
+        return None
+    except Exception as e:
+        st.error(f"Error learning from examples: {str(e)}")
+        return None
+
+# Function to generate test cases with learned rules
+def generate_test_cases_with_rules(prompt, num_cases, priority, severity, language, learned_rules=None):
+    """
+    Generate test cases using custom rules learned from examples
+    """
+    try:
+        rules_instruction = ""
+        if learned_rules:
+            rules_instruction = f"""
+            
+        IMPORTANT: Follow these learned patterns from the user's examples:
+        - ID Format: {learned_rules.get('id_format', 'TC_001')}
+        - Title Style: {learned_rules.get('title_style', 'Descriptive')}
+        - Steps Style: {learned_rules.get('steps_style', 'Numbered, imperative verbs')}
+        - Expected Results: {learned_rules.get('expected_results_style', 'Clear outcomes')}
+        - Tone: {learned_rules.get('tone', 'Professional')}
+        - Special Patterns: {', '.join(learned_rules.get('special_patterns', []))}
+        """
+        
+        language_instruction = ""
+        if language == "Arabic":
+            language_instruction = "\n        - IMPORTANT: Generate all test case content in Arabic language. Keep only JSON keys in English."
+        else:
+            language_instruction = "\n        - Generate all content in English language."
+        
+        prompt_template = f"""
+        You are a senior QA engineer with 15+ years of experience. 
+        Generate {num_cases} comprehensive test cases based on the following requirements:
+        
+        {prompt}
+        
+        Instructions:
+        - Default Priority: {priority}
+        - Default Severity: {severity}{language_instruction}{rules_instruction}
+        - Categorize each test case as: "positive", "negative", or "edge_case"
+        - Format test cases in JSON with this structure:
+        {{
+            "test_cases": [
+                {{
+                    "id": "TC_001",
+                    "title": "Test case title",
+                    "category": "positive/negative/edge_case",
+                    "test_type": "ui/api/unit_spec",
+                    "preconditions": ["Precondition 1", "Precondition 2"],
+                    "test_data": ["Data 1", "Data 2"],
+                    "test_steps": ["Step 1", "Step 2", "Step 3"],
+                    "expected_results": ["Expected result 1", "Expected result 2"],
+                    "priority": "High/Medium/Low",
+                    "severity": "Critical/Major/Normal/Minor",
+                    "attachments": []
+                }}
+            ],
+            "summary": {{
+                "total": 0,
+                "positive": 0,
+                "negative": 0,
+                "edge_cases": 0,
+                "ui_tests": 0,
+                "api_tests": 0,
+                "unit_specs": 0
+            }}
+        }}
+        """
+        
+        response_text = call_ai(prompt_template)
+        json_match = re.search(r'\{[\s\S]*\}', response_text)
+        if json_match:
+            json_str = json_match.group()
+            data = json.loads(json_str)
+            return data.get("test_cases", []), data.get("summary", {})
+        return [], {}
+    except Exception as e:
+        st.error(f"Error generating test cases with rules: {str(e)}")
+        return [], {}
+
+# Function to generate REST Assured API automation code
+def generate_rest_assured_code(test_case, use_bdd=True, custom_prompt="", api_spec="", learned_style=None):
+    """
+    Generate REST Assured API automation code
+    Supports BDD style (given/when/then)
+    Can use API spec documentation and learned coding style
+    """
+    try:
+        bdd_instruction = ""
+        if use_bdd:
+            bdd_instruction = """
+        - Use BDD style with given().when().then() pattern
+        - Add descriptive method chaining
+        - Use RequestSpecBuilder for reusable specs"""
+        else:
+            bdd_instruction = """
+        - Use standard RestAssured syntax
+        - Keep it simple and readable"""
+        
+        custom_section = f"\n\nAdditional Requirements:\n{custom_prompt}" if custom_prompt.strip() else ""
+        
+        # Add API spec context if provided
+        api_spec_section = ""
+        if api_spec:
+            api_spec_section = f"""
+        
+        API SPECIFICATION CONTEXT:
+        Use the following API documentation to ensure accurate endpoint URLs, methods, request/response formats:
+        
+        {api_spec[:3000]}  # Limit to 3000 chars to avoid token limits
+        """
+        
+        # Add learned style instructions if available
+        style_section = ""
+        if learned_style:
+            style_section = f"""
+        
+        CODING STYLE REQUIREMENTS (Learn from user's existing code):
+        - Class Naming: {learned_style.get('class_naming', 'Standard naming')}
+        - Method Naming: {learned_style.get('method_naming', 'Standard naming')}
+        - Assertion Style: {learned_style.get('assertion_style', 'Standard assertions')}
+        - Request Style: {learned_style.get('request_style', 'Standard requests')}
+        - Response Handling: {learned_style.get('response_handling', 'Standard handling')}
+        - Package Structure: {learned_style.get('package_structure', 'com.qa.api')}
+        
+        IMPORTANT: Match the user's coding style as closely as possible.
+        """
+        
+        prompt_template = f"""
+        You are a senior QA automation engineer with expertise in REST API testing.
+        Write complete, production-grade REST Assured test code in Java using TestNG.
+        
+        Based on the following test case:
+        - Title: {test_case['title']}
+        - Steps: 
+        {chr(10).join(test_case['test_steps'])}
+        - Expected Results: 
+        {chr(10).join(test_case['expected_results'])}
+        
+        API Testing Requirements:{bdd_instruction}
+        {api_spec_section}
+        {style_section}
+        
+        Include:
+        Include:
+        - TestNG annotations (@Test, @BeforeMethod, @AfterMethod) for test isolation
+        - Request specifications (headers, content type, base URI)
+        - Response validation (status code, body, headers)
+        - JSON path assertions
+        - SLF4J/Log4j2 Logging: Log Request details and Response status
+        - Robust Error handling
+        - Allure reporting annotations
+        {custom_section}
+        
+        Output the code in the following format:
+        
+        // FILE: src/test/java/com/qa/api/tests/{test_case['id']}ApiTest.java
+        [Java code here]
+        
+        // FILE: src/main/java/com/qa/api/specs/RequestSpecs.java
+        [Java code here]
+        """
+        
+        response_text = call_ai(prompt_template)
+        return response_text
+    except Exception as e:
+        st.error(f"Error generating REST Assured code: {str(e)}")
+        return ""
+
+# Function to generate unit test specifications for developers
+def generate_unit_test_specifications(test_case, output_format="markdown"):
+    """
+    Generate detailed unit test specifications for developers
+    Provides clear requirements for what to test at component level
+    """
+    try:
+        prompt_template = f"""
+        You are a senior QA engineer creating unit test specifications for developers.
+        
+        Based on the following test case:
+        - Title: {test_case['title']}
+        - Steps: 
+        {chr(10).join(test_case['test_steps'])}
+        - Expected Results: 
+        {chr(10).join(test_case['expected_results'])}
+        - Preconditions:
+        {chr(10).join(test_case.get('preconditions', []))}
+        
+        Generate a detailed unit test specification document that developers can use to implement unit tests.
+        
+        Include the following sections:
+        
+        1. **Overview**
+           - Brief description of what needs to be tested
+           - Component/Module being tested
+        
+        2. **Test Scenarios**
+           - List all test scenarios with clear descriptions
+           - Include positive, negative, and edge cases
+        
+        3. **Input Parameters**
+           - List all input parameters for each scenario
+           - Include valid and invalid values
+           - Specify data types and constraints
+        
+        4. **Expected Outputs**
+           - Expected return values
+           - Expected exceptions/errors
+           - State changes to verify
+        
+        5. **Mock/Stub Requirements**
+           - External dependencies to mock
+           - Expected mock behavior
+        
+        6. **Test Data**
+           - Sample test data for each scenario
+           - Boundary values
+        
+        7. **Assertions**
+           - Specific assertions to implement
+           - Verification points
+        
+        Format the output in clean, readable Markdown that developers can directly use.
+        """
+        
+        response_text = call_ai(prompt_template)
+        return response_text
+    except Exception as e:
+        st.error(f"Error generating unit test specifications: {str(e)}")
+        return ""
+
+# Function to generate combined automation code for multiple test cases (REST Assured)
+def generate_combined_rest_assured_code(test_cases, use_bdd=True, custom_prompt="", api_spec="", learned_style=None):
+    """Generate REST Assured code for multiple test cases with optional API spec and learned style"""
+    try:
+        test_cases_str = "\n\n".join(
+            [f"Test Case {idx+1}: {tc['title']}\n"
+             f"Steps:\n{chr(10).join(tc['test_steps'])}\n"
+             f"Expected Results:\n{chr(10).join(tc['expected_results'])}"
+             for idx, tc in enumerate(test_cases)]
+        )
+        
+        bdd_instruction = "- Use BDD style with given().when().then() pattern" if use_bdd else "- Use standard RestAssured syntax"
+        custom_section = f"\n\nAdditional Requirements:\n{custom_prompt}" if custom_prompt.strip() else ""
+        
+        # Add API spec context if provided
+        api_spec_section = ""
+        if api_spec:
+            api_spec_section = f"""
+        
+        API SPECIFICATION:
+        {api_spec[:3000]}
+        """
+        
+        # Add learned style instructions if available
+        style_section = ""
+        if learned_style:
+            style_section = f"""
+        
+        CODING STYLE (Match user's existing code):
+        - Class Naming: {learned_style.get('class_naming', 'Standard')}
+        - Method Naming: {learned_style.get('method_naming', 'Standard')}
+        - Assertion Style: {learned_style.get('assertion_style', 'Standard')}
+        - Request Style: {learned_style.get('request_style', 'Standard')}
+        """
+        
+        prompt_template = f"""
+        You are a senior QA automation engineer. Write a complete REST Assured test suite.
+        
+        Test Cases to automate:
+        {test_cases_str}
+        
+        Requirements:
+        {bdd_instruction}
+        - TestNG annotations (@BeforeMethod/@AfterMethod for isolation)
+        - Response validation & JSON path assertions
+        - Allure reporting
+        - Base test class with common setup
+        - SLF4J/Log4j2 Logging (INFO for flows, DEBUG for requests)
+        - Robust Exception Handling
+        {api_spec_section}
+        {style_section}
+        {custom_section}
+        
+        Output format:
+        
+        // FILE: src/test/java/com/qa/api/tests/ApiTestSuite.java
+        [Java code]
+        
+        // FILE: src/test/java/com/qa/api/base/BaseApiTest.java
+        [Java code]
+        
+        // FILE: src/main/java/com/qa/api/specs/RequestSpecs.java
+        [Java code]
+        """
+        
+        response_text = call_ai(prompt_template)
+        return response_text
+    except Exception as e:
+        st.error(f"Error generating combined REST Assured code: {str(e)}")
+        return ""
+
+
+
 # Function to show toast notification using Streamlit's built-in toast
 def show_toast(message, rerun_after=False):
     if rerun_after:
@@ -1013,11 +1396,28 @@ st.sidebar.image("Sumergelogo.png", use_container_width=True)
 # Simple sidebar navigation - single click works
 st.sidebar.markdown("### 🧭 Navigation")
 
-nav_options = ["🏠 Home", "🧪 Test Case Generator", "🤖 Test Automation", "📋 Test Plan Generator", "💬 AI Chat"]
+nav_options = ["🏠 Home", "🧪 Test Case Generator", "🤖 Test Automation", "📋 Test Plan Generator", "🐞 Bug Report Generator", "💬 AI Chat"]
+
+# Check for query param navigation BEFORE widget is rendered
+query_page = st.query_params.get("page")
+if query_page:
+    # Map query param to nav option
+    page_mapping = {
+        "Test Automation": "🤖 Test Automation",
+        "Test Case Generator": "🧪 Test Case Generator",
+        "Test Plan Generator": "📋 Test Plan Generator",
+        "Bug Report Generator": "🐞 Bug Report Generator",
+        "AI Chat": "💬 AI Chat",
+        "Home": "🏠 Home"
+    }
+    if query_page in page_mapping:
+        # Set the navigation in session state BEFORE widget renders
+        st.session_state.nav_radio_widget = page_mapping[query_page]
+        st.session_state.main_navigation = page_mapping[query_page]
+        # Clear the query param
+        st.query_params.clear()
 
 # Determine index based on session state if available
-# CRITICAL FIX: Only set index if the widget key is NOT in session state.
-# If key is in session state (e.g. set by callback), let the widget use it.
 radio_kwargs = {
     "label": "Select Page",
     "options": nav_options,
@@ -1071,6 +1471,39 @@ if page == "Home":
     </div>
     """, unsafe_allow_html=True)
     
+    # Project Dashboard
+    st.markdown("### 📊 Project Dashboard")
+    dash_col1, dash_col2, dash_col3, dash_col4 = st.columns(4)
+    
+    with dash_col1:
+        st.metric("Test Cases Created", len(st.session_state.test_cases), help="Total test cases in current session")
+    with dash_col2:
+        # Calculate generated scripts count
+        script_count = 0
+        if st.session_state.get('automation_code'):
+             if "combined" in st.session_state.automation_code:
+                 script_count = len(st.session_state.automation_code["combined"])
+             else:
+                 script_count = sum(len(v) for v in st.session_state.automation_code.values())
+        st.metric("Scripts Generated", script_count, help="Automation scripts generated")
+    with dash_col3:
+        st.metric("Active AI Model", st.session_state.get('model_provider', 'Gemini'), help="Current AI provider")
+    with dash_col4:
+        st.metric("Bug Reports", st.session_state.get('bug_reports_count', 0), help="Bug reports generated in this session")
+    
+    st.markdown("---")
+
+    # Feature Highlights (What's New)
+    with st.expander("✨ What's New in v2.0", expanded=True):
+        st.markdown("""
+        - **🐞 Bug Report Generator**: Convert rough notes into professional bug reports (English/Arabic).
+        - **⚡ Quick Commands**: Generate test cases instantly from templates or BRD files!
+        - **🤖 Advanced Automation**: Now supports **Action-Based Testing** (Bot Style) and **REST Assured**.
+        - **🧱 Enterprise Patterns**: Component Objects, Fluent Interfaces, and robust error handling.
+        - **📝 Interactive Requirements**: Upload docs, preview, and refine content before generation.
+        - **🔌 API Testing**: Upload Swagger/OpenAPI specs for precise test generation.
+        """)
+
     # Features Section with Robot Emojis
     st.markdown("### 🤖 What Can Our AI Robots Do For You?")
     
@@ -1356,8 +1789,236 @@ elif page == "Test Case Generator":
     # User Guidance for Google Sheets
     if not st.session_state.get('google_creds'):
         st.info("💡 **Tip**: To save your TestCases directly to Google Sheets, please **Login via the Sidebar** BEFORE creating your test case to avoid losing your work during the reload.")
+    
+    # Quick Commands Section
+    with st.expander("⚡ Quick Commands - Fast Test Generation", expanded=False):
+        st.markdown("Select a template and provide minimal input for instant test case generation!")
         
-    tab1, tab2 = st.tabs(["Manual Creation", "Generate from Requirements"])
+        quick_command = st.selectbox(
+            "Choose a quick command:",
+            ["Select a template...", "📄 From BRD/Requirements File", "🔐 Login Feature Tests", 
+             "📝 CRUD Operations", "🔗 API Endpoint Tests", "🛒 E-commerce Flow",
+             "👤 User Registration", "🔍 Search Feature"],
+            key="quick_command"
+        )
+        
+        if quick_command != "Select a template...":
+            st.markdown("---")
+            
+            # Dynamic inputs based on selected command
+            if quick_command == "📄 From BRD/Requirements File":
+                st.markdown("### 📄 Generate from BRD/Requirements")
+                
+                input_tab1, input_tab2 = st.tabs(["📂 Upload File", "✍️ Paste Text"])
+                
+                final_req_content = ""
+                
+                with input_tab1:
+                    brd_quick_file = st.file_uploader(
+                        "Upload BRD or Requirements Document",
+                        type=['md', 'txt', 'pdf', 'docx', 'csv', 'xlsx'],
+                        key="quick_brd"
+                    )
+                    
+                    if brd_quick_file:
+                        try:
+                            if brd_quick_file.type in FILE_PROCESSORS:
+                                raw_content = FILE_PROCESSORS[brd_quick_file.type](brd_quick_file)
+                            else:
+                                raw_content = brd_quick_file.read().decode('utf-8')
+                                
+                            st.success(f"✅ Loaded {len(raw_content)} characters")
+                            st.caption("You can edit the extracted text below to focus on specific parts:")
+                            final_req_content = st.text_area("Extracted Requirements Content", value=raw_content, height=200, key="brd_edit")
+                        except Exception as e:
+                            st.error(f"Error reading file: {e}")
+                
+                with input_tab2:
+                    direct_input = st.text_area("Paste requirements here...", height=200, key="brd_paste")
+                    if direct_input:
+                        final_req_content = direct_input
+
+                # Additional instructions
+                focus_area = st.text_area("💡 Additional Instructions / Focus Area", 
+                                        placeholder="e.g., 'Focus only on the payment gateway scenarios' or 'Ignore the admin panel section'",
+                                        height=100)
+                
+                num_cases_quick = st.slider("Number of test cases", 5,10,15,20,30, key="quick_num_brd")
+                
+                if st.button("🚀 Generate from Requirements", key="gen_brd_quick", use_container_width=True, disabled=not final_req_content):
+                    with st.spinner("Generating test cases from requirements..."):
+                        try:
+                            focus_instruction = f"\nUSER INSTRUCTIONS: {focus_area}" if focus_area else ""
+                            prompt = f"Based on the following requirements, generate comprehensive test cases:{focus_instruction}\n\nREQUIREMENTS:\n{final_req_content}"
+                            
+                            generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                            if generated:
+                                for i, tc in enumerate(generated):
+                                    tc["id"] = f"TC_{module_name}_Q{len(st.session_state.test_cases) + i + 1}"
+                                    tc["selected"] = False
+                                st.session_state.test_cases.extend(generated)
+                                show_toast(f"✅ Generated {len(generated)} test cases!")
+                        except Exception as e:
+                            st.error(f"Error: {e}")
+            
+            elif quick_command == "🔐 Login Feature Tests":
+                st.markdown("### 🔐 Login Feature Test Cases")
+                login_url = st.text_input("Login Page URL or Description", placeholder="https://example.com/login or 'Mobile app login screen'")
+                has_2fa = st.checkbox("Has Two-Factor Authentication?")
+                has_social = st.checkbox("Has Social Login (Google/Facebook)?")
+                num_cases_quick = st.slider("Number of test cases", 5, 25, 12, key="quick_num_login")
+                
+                if st.button("🚀 Generate Login Tests", key="gen_login_quick", use_container_width=True, disabled=not login_url):
+                    with st.spinner("Generating login test cases..."):
+                        extras = []
+                        if has_2fa: extras.append("2FA/OTP verification")
+                        if has_social: extras.append("Social login (Google, Facebook)")
+                        extras_str = f"\nAdditional features: {', '.join(extras)}" if extras else ""
+                        
+                        prompt = f"""Generate comprehensive test cases for a login feature:
+                        Login Page: {login_url}
+                        {extras_str}
+                        
+                        Include: valid login, invalid credentials, empty fields, locked accounts, password reset, remember me, session handling"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_LOGIN{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} login test cases!")
+            
+            elif quick_command == "📝 CRUD Operations":
+                st.markdown("### 📝 CRUD Operations Test Cases")
+                entity_name = st.text_input("Entity Name", placeholder="e.g., User, Product, Order")
+                entity_fields = st.text_input("Main Fields (comma-separated)", placeholder="e.g., name, email, phone, address")
+                num_cases_quick = st.slider("Number of test cases", 5, 25, 15, key="quick_num_crud")
+                
+                if st.button("🚀 Generate CRUD Tests", key="gen_crud_quick", use_container_width=True, disabled=not entity_name):
+                    with st.spinner("Generating CRUD test cases..."):
+                        prompt = f"""Generate comprehensive CRUD test cases for {entity_name} entity.
+                        Fields: {entity_fields if entity_fields else 'standard fields'}
+                        
+                        Cover: Create new {entity_name}, Read/View {entity_name}, Update {entity_name}, Delete {entity_name},
+                        validation, required fields, duplicate handling, bulk operations, filtering, sorting, pagination"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_CRUD{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} CRUD test cases!")
+            
+            elif quick_command == "🔗 API Endpoint Tests":
+                st.markdown("### 🔗 API Endpoint Test Cases")
+                api_input_method = st.radio("How to provide API info?", ["Type Endpoint", "Upload Technical Doc"], horizontal=True)
+                
+                api_info = ""
+                if api_input_method == "Type Endpoint":
+                    endpoint = st.text_input("Endpoint URL", placeholder="/api/v1/users")
+                    method = st.selectbox("HTTP Method", ["GET", "POST", "PUT", "DELETE", "PATCH"])
+                    params = st.text_input("Parameters (optional)", placeholder="id, name, status")
+                    api_info = f"Endpoint: {method} {endpoint}\nParameters: {params}"
+                else:
+                    api_doc = st.file_uploader("Upload API Documentation", type=['json', 'yaml', 'yml', 'md', 'txt', 'pdf', 'docx'], key="quick_api_doc")
+                    if api_doc:
+                        try:
+                            if api_doc.type in FILE_PROCESSORS:
+                                api_info = FILE_PROCESSORS[api_doc.type](api_doc)
+                            else:
+                                api_info = api_doc.read().decode('utf-8')
+                        except:
+                            st.error("Could not read file")
+                
+                num_cases_quick = st.slider("Number of test cases", 5, 25, 12, key="quick_num_api")
+                
+                if st.button("🚀 Generate API Tests", key="gen_api_quick", use_container_width=True, disabled=not api_info):
+                    with st.spinner("Generating API test cases..."):
+                        prompt = f"""Generate comprehensive API test cases:
+                        {api_info}
+                        
+                        Cover: success responses, error codes (400, 401, 403, 404, 500), validation, authentication, 
+                        rate limiting, pagination, filtering, edge cases, boundary values"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_API{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} API test cases!")
+            
+            elif quick_command == "🛒 E-commerce Flow":
+                st.markdown("### 🛒 E-commerce Flow Test Cases")
+                features = st.multiselect("Select features to test:", 
+                    ["Product Browse", "Shopping Cart", "Checkout", "Payment", "Order History", "Wishlist", "Reviews"])
+                num_cases_quick = st.slider("Number of test cases", 5, 30, 15, key="quick_num_ecom")
+                
+                if st.button("🚀 Generate E-commerce Tests", key="gen_ecom_quick", use_container_width=True, disabled=not features):
+                    with st.spinner("Generating e-commerce test cases..."):
+                        prompt = f"""Generate comprehensive e-commerce test cases for:
+                        Features: {', '.join(features)}
+                        
+                        Cover: add to cart, remove from cart, quantity changes, price calculations, 
+                        discounts/coupons, shipping options, payment methods, order confirmation"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_ECOM{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} e-commerce test cases!")
+            
+            elif quick_command == "👤 User Registration":
+                st.markdown("### 👤 User Registration Test Cases")
+                reg_fields = st.text_input("Registration Fields", placeholder="e.g., name, email, password, phone")
+                has_email_verify = st.checkbox("Email Verification Required?")
+                num_cases_quick = st.slider("Number of test cases", 5, 20, 12, key="quick_num_reg")
+                
+                if st.button("🚀 Generate Registration Tests", key="gen_reg_quick", use_container_width=True):
+                    with st.spinner("Generating registration test cases..."):
+                        verify = "\n- Email verification flow" if has_email_verify else ""
+                        prompt = f"""Generate comprehensive user registration test cases.
+                        Fields: {reg_fields if reg_fields else 'standard registration fields'}
+                        {verify}
+                        
+                        Cover: valid registration, validation errors, duplicate email, password requirements,
+                        terms acceptance, optional fields, confirmation messages"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_REG{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} registration test cases!")
+            
+            elif quick_command == "🔍 Search Feature":
+                st.markdown("### 🔍 Search Feature Test Cases")
+                search_entity = st.text_input("What can be searched?", placeholder="e.g., Products, Users, Articles")
+                search_filters = st.text_input("Available Filters (optional)", placeholder="e.g., category, price range, date")
+                num_cases_quick = st.slider("Number of test cases", 5, 20, 10, key="quick_num_search")
+                
+                if st.button("🚀 Generate Search Tests", key="gen_search_quick", use_container_width=True, disabled=not search_entity):
+                    with st.spinner("Generating search test cases..."):
+                        prompt = f"""Generate comprehensive search feature test cases for searching: {search_entity}
+                        Filters: {search_filters if search_filters else 'standard filters'}
+                        
+                        Cover: basic search, empty search, special characters, no results, partial matches,
+                        filtering, sorting, pagination, search suggestions, recent searches"""
+                        
+                        generated = generate_test_cases_from_prompt(prompt, num_cases_quick, priority, severity, language)
+                        if generated:
+                            for i, tc in enumerate(generated):
+                                tc["id"] = f"TC_{module_name}_SEARCH{len(st.session_state.test_cases) + i + 1}"
+                                tc["selected"] = False
+                            st.session_state.test_cases.extend(generated)
+                            show_toast(f"✅ Generated {len(generated)} search test cases!")
+    
+    tab1, tab2, tab3 = st.tabs(["Manual Creation", "Generate from Requirements", "🎓 Learn from Examples"])
     
     with tab1:
         st.subheader("Create Manual Test Case")
@@ -1627,6 +2288,195 @@ elif page == "Test Case Generator":
             else:
                 st.warning("Please enter requirements or upload a file to generate test cases")
     
+    with tab3:
+        st.subheader("🎓 Learn from Your Examples")
+        st.markdown("""
+        Upload your existing test cases as examples, and the AI will **learn your writing style** 
+        to generate new test cases that match your format and conventions.
+        """)
+        
+        # Initialize session state for learned rules
+        if 'learned_rules' not in st.session_state:
+            st.session_state.learned_rules = None
+        
+        # Step 1: Upload Examples
+        st.markdown("### Step 1: Upload Example Test Cases")
+        st.info("📁 Upload 3-5 of your best test case examples (MD, TXT, PDF, DOCX)")
+        
+        example_files = st.file_uploader(
+            "Upload example test cases",
+            accept_multiple_files=True,
+            type=['md', 'txt', 'pdf', 'docx'],
+            key="example_uploader"
+        )
+        
+        if example_files:
+            st.success(f"✅ {len(example_files)} example(s) uploaded")
+            for f in example_files:
+                with st.expander(f"📄 {f.name}"):
+                    try:
+                        if f.type in FILE_PROCESSORS:
+                            content = FILE_PROCESSORS[f.type](f)
+                        else:
+                            content = f.read().decode('utf-8')
+                            f.seek(0)
+                        st.text(content[:500] + "..." if len(content) > 500 else content)
+                    except:
+                        st.warning("Could not preview this file")
+        
+        # Step 2: Learn Patterns
+        st.markdown("### Step 2: Analyze Patterns")
+        
+        if st.button("🔍 Learn from Examples", use_container_width=True, disabled=not example_files):
+            with st.spinner("Analyzing your test case examples..."):
+                # Extract content from all examples
+                example_contents = []
+                for f in example_files:
+                    try:
+                        if f.type in FILE_PROCESSORS:
+                            content = FILE_PROCESSORS[f.type](f)
+                        else:
+                            content = f.read().decode('utf-8')
+                            f.seek(0)
+                        example_contents.append(content)
+                    except Exception as e:
+                        st.warning(f"Could not process {f.name}: {e}")
+                
+                if example_contents:
+                    learned = learn_from_examples(example_contents)
+                    if learned:
+                        st.session_state.learned_rules = learned
+                        show_toast("✅ Successfully learned patterns from your examples!")
+                    else:
+                        st.error("Could not learn patterns. Please try with different examples.")
+        
+        # Display learned patterns
+        if st.session_state.learned_rules:
+            st.markdown("### 📊 Learned Patterns")
+            rules = st.session_state.learned_rules
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**ID Format:** `{rules.get('id_format', 'N/A')}`")
+                st.markdown(f"**Title Style:** {rules.get('title_style', 'N/A')}")
+                st.markdown(f"**Tone:** {rules.get('tone', 'N/A')}")
+            with col2:
+                st.markdown(f"**Steps Style:** {rules.get('steps_style', 'N/A')}")
+                st.markdown(f"**Expected Results:** {rules.get('expected_results_style', 'N/A')}")
+            
+            if rules.get('special_patterns'):
+                st.markdown("**Special Patterns:**")
+                for pattern in rules.get('special_patterns', []):
+                    st.markdown(f"- {pattern}")
+            
+            st.info(f"💡 **Summary:** {rules.get('summary', 'N/A')}")
+            
+            # Step 3: Generate with Learned Style
+            st.markdown("### Step 3: Generate Test Cases with Learned Style")
+            
+            # Option to upload BRD or enter requirements
+            req_input_method = st.radio(
+                "How would you like to provide requirements?",
+                ["📝 Type Requirements", "📁 Upload BRD/Requirements File", "🔄 Both"],
+                horizontal=True,
+                key="req_input_method"
+            )
+            
+            learn_requirements = ""
+            
+            # Text input for requirements
+            if req_input_method in ["📝 Type Requirements", "🔄 Both"]:
+                learn_requirements = st.text_area(
+                    "Enter requirements to generate test cases:",
+                    height=150,
+                    placeholder="Describe the feature or functionality you want to test...",
+                    key="learn_requirements"
+                )
+            
+            # File upload for BRD
+            if req_input_method in ["📁 Upload BRD/Requirements File", "🔄 Both"]:
+                brd_file = st.file_uploader(
+                    "Upload BRD or Requirements Document",
+                    type=['md', 'txt', 'pdf', 'docx', 'csv', 'xlsx'],
+                    key="brd_uploader",
+                    help="Upload your Business Requirements Document, User Stories, or any requirements file"
+                )
+                
+                if brd_file:
+                    st.success(f"✅ Uploaded: {brd_file.name}")
+                    try:
+                        # Extract content from the uploaded file
+                        if brd_file.type in FILE_PROCESSORS:
+                            brd_content = FILE_PROCESSORS[brd_file.type](brd_file)
+                        else:
+                            brd_content = brd_file.read().decode('utf-8')
+                            brd_file.seek(0)
+                        
+                        # Show preview
+                        with st.expander("📄 Preview uploaded requirements", expanded=False):
+                            st.text(brd_content[:1000] + "..." if len(brd_content) > 1000 else brd_content)
+                        
+                        # Combine with typed requirements if "Both" is selected
+                        if req_input_method == "🔄 Both" and learn_requirements:
+                            learn_requirements = f"{learn_requirements}\n\n--- Uploaded Requirements ---\n\n{brd_content}"
+                        else:
+                            learn_requirements = brd_content
+                    except Exception as e:
+                        st.error(f"Could not read file: {e}")
+            
+            learn_col1, learn_col2 = st.columns(2)
+            with learn_col1:
+                learn_num_cases = st.slider("Number of test cases", 1, 30, 10, key="learn_num")
+            with learn_col2:
+                learn_test_type = st.selectbox(
+                    "Test Type",
+                    ["All Types", "UI Tests", "API Tests", "Unit Test Specs"],
+                    key="learn_test_type"
+                )
+            
+            # Enable button if we have requirements from either source
+            has_requirements = bool(learn_requirements and learn_requirements.strip())
+            
+            if st.button("🚀 Generate with Learned Style", use_container_width=True, disabled=not has_requirements):
+                with st.spinner(f"Generating {learn_num_cases} test cases with your style..."):
+                    generated, summary = generate_test_cases_with_rules(
+                        learn_requirements, 
+                        learn_num_cases, 
+                        priority, 
+                        severity, 
+                        language,
+                        st.session_state.learned_rules
+                    )
+                    
+                    if generated:
+                        # Assign unique IDs and add to test cases
+                        for i, tc in enumerate(generated):
+                            tc["id"] = f"TC_{module_name}_L{len(st.session_state.test_cases) + i + 1}"
+                            tc["selected"] = False
+                            if "severity" not in tc:
+                                tc["severity"] = severity
+                            if "attachments" not in tc:
+                                tc["attachments"] = []
+                        
+                        st.session_state.test_cases.extend(generated)
+                        
+                        # Show summary
+                        if summary:
+                            st.success(f"""
+                            ✅ Generated {len(generated)} test cases!
+                            📊 **Summary:** Positive: {summary.get('positive', 0)} | Negative: {summary.get('negative', 0)} | Edge Cases: {summary.get('edge_cases', 0)}
+                            """)
+                        else:
+                            show_toast(f"✅ Generated {len(generated)} test cases with your style!")
+                    else:
+                        st.error("Failed to generate test cases. Please try again.")
+            
+            # Option to clear learned rules
+            if st.button("🗑️ Clear Learned Patterns", key="clear_rules"):
+                st.session_state.learned_rules = None
+                st.rerun()
+
+    
     # Export to Excel function
     def export_test_cases_to_excel(test_cases):
         """Convert test cases to Excel file"""
@@ -1715,7 +2565,7 @@ elif page == "Test Case Generator":
                 with b_col1:
                     if st.button(f"🚀 Automate ({selected_count})", key="gen_selected"):
                         st.session_state.selected_test_cases = selected_cases
-                        st.session_state.nav_radio_widget = "🤖 Test Automation"
+                        st.query_params["page"] = "Test Automation"
                         st.rerun()
                 
                 with b_col2:
@@ -2006,37 +2856,188 @@ elif page == "Test Case Generator":
 
 # Test Automation Page
 elif page == "Test Automation":
-    st.subheader("🤖 Java Selenium Automation Generator")
+    st.subheader("🤖 Test Automation Generator")
     
     if st.session_state.selected_test_cases:
-        st.success(f"Generating automation code for {len(st.session_state.selected_test_cases)} test cases")
+        st.success(f"✅ {len(st.session_state.selected_test_cases)} test cases selected for automation")
         
-        # Generation mode selection
-        st.markdown('<div class="combined-toggle">', unsafe_allow_html=True)
-        st.radio(
-            "Generation Mode:",
-            ["Combined Test Suite", "Separate Test Classes"],
-            key="generation_mode",
-            horizontal=True
+        # Show selected test cases summary
+        with st.expander("📋 Selected Test Cases", expanded=False):
+            for tc in st.session_state.selected_test_cases:
+                st.markdown(f"- **{tc['id']}**: {tc['title']}")
+        
+        st.markdown("---")
+        
+        # Framework Selection
+        st.markdown("### 🛠️ Select Automation Framework")
+        automation_framework = st.selectbox(
+            "Choose framework based on your test type:",
+            ["🖥️ Selenium WebDriver (UI Tests)", "🔗 REST Assured (API Tests)", "📋 Unit Test Specifications (For Developers)"],
+            key="automation_framework"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
         
-        # Design Pattern Options
+        # Generation mode selection (for Selenium and REST Assured)
+        if "Selenium" in automation_framework or "REST Assured" in automation_framework:
+            st.radio(
+                "Generation Mode:",
+                ["Combined Test Suite", "Separate Test Classes"],
+                key="generation_mode",
+                horizontal=True
+            )
+        
+        # Design Pattern Options - shown based on framework selection
         st.markdown("### ⚙️ Code Generation Options")
         
-        col_opt1, col_opt2 = st.columns(2)
-        with col_opt1:
-            use_pom = st.checkbox("📄 Use Page Object Model (POM)", value=True, 
-                                  help="Separate page elements and actions into Page classes")
-            use_oop = st.checkbox("🏗️ Use OOP Principles", value=True,
-                                  help="Apply inheritance, encapsulation, and SOLID principles")
-            use_bot_style = st.checkbox("🤖 Bot Style Architecture", value=False,
-                                        help="Fluent/chainable Bot class for action sequences")
-        with col_opt2:
-            use_data_driven = st.checkbox("📊 Data-Driven Testing", value=False,
-                                          help="Use @DataProvider for parameterized tests")
-            use_bdd = st.checkbox("📝 BDD Style Comments", value=False,
-                                  help="Add Given-When-Then style comments")
+        # Framework-specific options
+        if "Selenium" in automation_framework:
+            col_opt1, col_opt2 = st.columns(2)
+            with col_opt1:
+                use_pom = st.checkbox("📄 Use Page Object Model (POM)", value=True, 
+                                      help="Separate page elements and actions into Page classes")
+                use_oop = st.checkbox("🏗️ Use OOP Principles", value=True,
+                                      help="Apply inheritance, encapsulation, and SOLID principles")
+                use_bot_style = st.checkbox("🤖 Bot Style Architecture", value=False,
+                                            help="Fluent/chainable Bot class for action sequences")
+            with col_opt2:
+                use_data_driven = st.checkbox("📊 Data-Driven Testing", value=False,
+                                              help="Use @DataProvider for parameterized tests")
+                use_bdd = st.checkbox("📝 BDD Style Comments", value=False,
+                                      help="Add Given-When-Then style comments")
+        elif "REST Assured" in automation_framework:
+            # REST Assured specific options
+            col_opt1, col_opt2 = st.columns(2)
+            with col_opt1:
+                use_bdd = st.checkbox("📝 BDD Style (given/when/then)", value=True,
+                                      help="Use BDD style with given().when().then() pattern")
+                use_data_driven = st.checkbox("📊 Data-Driven Testing", value=False,
+                                              help="Use @DataProvider for parameterized API tests")
+            with col_opt2:
+                use_oop = st.checkbox("🏗️ Base Test Class", value=True,
+                                      help="Create reusable base test class")
+            use_pom = False
+            use_bot_style = False
+            
+            st.markdown("---")
+            
+            # API Specification Upload Section
+            st.markdown("### 📄 API Documentation (Optional)")
+            st.info("Upload API specs (Swagger/OpenAPI) or technical docs from developers for more accurate test generation")
+            
+            api_spec_file = st.file_uploader(
+                "Upload API Specification",
+                type=['json', 'yaml', 'yml', 'md', 'txt', 'pdf', 'docx'],
+                key="api_spec_uploader",
+                help="Swagger, OpenAPI, Postman collection, or any API documentation"
+            )
+            
+            api_spec_content = ""
+            if api_spec_file:
+                st.success(f"✅ Uploaded: {api_spec_file.name}")
+                try:
+                    if api_spec_file.type in FILE_PROCESSORS:
+                        api_spec_content = FILE_PROCESSORS[api_spec_file.type](api_spec_file)
+                    else:
+                        api_spec_content = api_spec_file.read().decode('utf-8')
+                        api_spec_file.seek(0)
+                    
+                    with st.expander("📋 Preview API Spec", expanded=False):
+                        st.code(api_spec_content[:2000] + "..." if len(api_spec_content) > 2000 else api_spec_content)
+                    
+                    # Store in session state for use in generation
+                    st.session_state.api_spec_content = api_spec_content
+                except Exception as e:
+                    st.error(f"Could not read file: {e}")
+            
+            st.markdown("---")
+            
+            # Learn from Existing REST Assured Scripts
+            st.markdown("### 🎓 Learn from Your Scripts (Optional)")
+            st.info("Upload your existing REST Assured scripts and AI will learn your coding style")
+            
+            example_scripts = st.file_uploader(
+                "Upload Example REST Assured Scripts",
+                type=['java', 'txt'],
+                accept_multiple_files=True,
+                key="rest_assured_examples",
+                help="Upload 1-3 of your best REST Assured test scripts"
+            )
+            
+            learned_script_style = None
+            if example_scripts:
+                st.success(f"✅ {len(example_scripts)} script(s) uploaded")
+                
+                # Preview uploaded scripts
+                for script in example_scripts:
+                    with st.expander(f"📄 {script.name}", expanded=False):
+                        content = script.read().decode('utf-8')
+                        script.seek(0)
+                        st.code(content[:1500] + "..." if len(content) > 1500 else content, language='java')
+                
+                # Learn button
+                if st.button("🔍 Learn from Scripts", key="learn_rest_scripts"):
+                    with st.spinner("Analyzing your REST Assured coding style..."):
+                        script_contents = []
+                        for script in example_scripts:
+                            content = script.read().decode('utf-8')
+                            script.seek(0)
+                            script_contents.append(content)
+                        
+                        # Use AI to learn patterns
+                        learn_prompt = f"""
+                        Analyze these REST Assured test scripts and extract the coding patterns and style:
+                        
+                        {chr(10).join(['---SCRIPT---' + chr(10) + s for s in script_contents])}
+                        
+                        Return a JSON with:
+                        {{
+                            "package_structure": "How packages are organized",
+                            "class_naming": "Class naming convention",
+                            "method_naming": "Method naming convention",
+                            "assertion_style": "How assertions are written",
+                            "request_style": "How requests are structured",
+                            "response_handling": "How responses are validated",
+                            "logging_approach": "Logging style used",
+                            "special_patterns": ["List of unique patterns"]
+                        }}
+                        """
+                        
+                        try:
+                            response = call_ai(learn_prompt)
+                            json_match = re.search(r'\{[\s\S]*\}', response)
+                            if json_match:
+                                st.session_state.learned_rest_style = json.loads(json_match.group())
+                                show_toast("✅ Learned your REST Assured coding style!")
+                        except Exception as e:
+                            st.error(f"Error learning style: {e}")
+                
+                # Display learned style
+                if st.session_state.get('learned_rest_style'):
+                    style = st.session_state.learned_rest_style
+                    with st.expander("📊 Learned Style", expanded=True):
+                        cols = st.columns(2)
+                        with cols[0]:
+                            st.markdown(f"**Class Naming:** {style.get('class_naming', 'N/A')}")
+                            st.markdown(f"**Method Naming:** {style.get('method_naming', 'N/A')}")
+                            st.markdown(f"**Request Style:** {style.get('request_style', 'N/A')}")
+                        with cols[1]:
+                            st.markdown(f"**Assertion Style:** {style.get('assertion_style', 'N/A')}")
+                            st.markdown(f"**Response Handling:** {style.get('response_handling', 'N/A')}")
+                    
+                    if st.button("🗑️ Clear Learned Style", key="clear_rest_style"):
+                        del st.session_state.learned_rest_style
+                        st.rerun()
+        else:  # Unit Test Specifications
+            st.info("📋 Unit Test Specifications will generate detailed documentation for developers to implement unit tests.")
+            output_format = st.selectbox(
+                "Output Format:",
+                ["Markdown", "Detailed Report"],
+                key="unit_spec_format"
+            )
+            use_pom = False
+            use_oop = False
+            use_bot_style = False
+            use_data_driven = False
+            use_bdd = False
         
         # Custom Prompt Section
         with st.expander("✏️ Custom Instructions (Optional)", expanded=False):
@@ -2047,33 +3048,22 @@ elif page == "Test Automation":
                 key="custom_automation_prompt"
             )
         
-        # Generate automation code
-        if st.button("Generate Automation Code", key="generate_automation", use_container_width=True):
-            with st.spinner("Generating production-ready Java Selenium code..."):
-                st.session_state.automation_code = {}
-                
-                # Get custom prompt value
-                custom_prompt_value = st.session_state.get('custom_automation_prompt', '')
-                
-                if st.session_state.generation_mode == "Combined Test Suite":
-                    # Generate combined test suite
-                    automation_code = generate_combined_automation_code(
-                        st.session_state.selected_test_cases,
-                        use_pom=use_pom,
-                        use_oop=use_oop,
-                        use_data_driven=use_data_driven,
-                        use_bdd=use_bdd,
-                        use_bot_style=use_bot_style,
-                        custom_prompt=custom_prompt_value
-                    )
-                    if automation_code:
-                        st.session_state.automation_code["combined"] = parse_generated_code(automation_code)
-                        show_toast("✅ Combined test suite generated successfully!")
-                else:
-                    # Generate separate files for each test case
-                    for test_case in st.session_state.selected_test_cases:
-                        automation_code = generate_test_case_automation_code(
-                            test_case,
+        # Generate button - different label based on framework
+        button_label = "Generate Selenium Code" if "Selenium" in automation_framework else \
+                       "Generate REST Assured Code" if "REST Assured" in automation_framework else \
+                       "Generate Unit Test Specifications"
+        
+        if st.button(f"🚀 {button_label}", key="generate_automation", use_container_width=True):
+            custom_prompt_value = st.session_state.get('custom_automation_prompt', '')
+            
+            # Framework-specific generation
+            if "Selenium" in automation_framework:
+                with st.spinner("Generating production-ready Java Selenium code..."):
+                    st.session_state.automation_code = {}
+                    
+                    if st.session_state.get('generation_mode') == "Combined Test Suite":
+                        automation_code = generate_combined_automation_code(
+                            st.session_state.selected_test_cases,
                             use_pom=use_pom,
                             use_oop=use_oop,
                             use_data_driven=use_data_driven,
@@ -2081,10 +3071,97 @@ elif page == "Test Automation":
                             use_bot_style=use_bot_style,
                             custom_prompt=custom_prompt_value
                         )
-                        st.session_state.automation_code[test_case['id']] = parse_generated_code(automation_code)
-                    show_toast("✅ Automation code generated successfully!")
+                        if automation_code:
+                            st.session_state.automation_code["combined"] = parse_generated_code(automation_code)
+                            show_toast("✅ Combined Selenium test suite generated successfully!")
+                    else:
+                        for test_case in st.session_state.selected_test_cases:
+                            automation_code = generate_test_case_automation_code(
+                                test_case,
+                                use_pom=use_pom,
+                                use_oop=use_oop,
+                                use_data_driven=use_data_driven,
+                                use_bdd=use_bdd,
+                                use_bot_style=use_bot_style,
+                                custom_prompt=custom_prompt_value
+                            )
+                            st.session_state.automation_code[test_case['id']] = parse_generated_code(automation_code)
+                        show_toast("✅ Selenium automation code generated successfully!")
+            
+            elif "REST Assured" in automation_framework:
+                with st.spinner("Generating production-ready REST Assured API test code..."):
+                    st.session_state.automation_code = {}
+                    
+                    # Get API spec and learned style from session state
+                    api_spec = st.session_state.get('api_spec_content', '')
+                    learned_style = st.session_state.get('learned_rest_style', None)
+                    
+                    if st.session_state.get('generation_mode') == "Combined Test Suite":
+                        automation_code = generate_combined_rest_assured_code(
+                            st.session_state.selected_test_cases,
+                            use_bdd=use_bdd,
+                            custom_prompt=custom_prompt_value,
+                            api_spec=api_spec,
+                            learned_style=learned_style
+                        )
+                        if automation_code:
+                            st.session_state.automation_code["combined"] = parse_generated_code(automation_code)
+                            show_toast("✅ Combined REST Assured test suite generated successfully!")
+                    else:
+                        for test_case in st.session_state.selected_test_cases:
+                            automation_code = generate_rest_assured_code(
+                                test_case,
+                                use_bdd=use_bdd,
+                                custom_prompt=custom_prompt_value,
+                                api_spec=api_spec,
+                                learned_style=learned_style
+                            )
+                            st.session_state.automation_code[test_case['id']] = parse_generated_code(automation_code)
+                        show_toast("✅ REST Assured automation code generated successfully!")
+            
+            else:  # Unit Test Specifications
+                with st.spinner("Generating unit test specifications for developers..."):
+                    st.session_state.unit_test_specs = {}
+                    
+                    for test_case in st.session_state.selected_test_cases:
+                        specs = generate_unit_test_specifications(test_case)
+                        st.session_state.unit_test_specs[test_case['id']] = specs
+                    
+                    show_toast(f"✅ Generated specifications for {len(st.session_state.selected_test_cases)} test cases!")
         
-        if st.session_state.automation_code:
+        # Display results based on framework
+        if "Unit Test Specifications" in automation_framework and st.session_state.get('unit_test_specs'):
+            st.markdown("### 📋 Generated Unit Test Specifications")
+            
+            for tc in st.session_state.selected_test_cases:
+                if tc['id'] in st.session_state.unit_test_specs:
+                    with st.expander(f"📄 {tc['id']}: {tc['title']}", expanded=False):
+                        st.markdown(st.session_state.unit_test_specs[tc['id']])
+                        
+                        # Download button for each specification
+                        st.download_button(
+                            label=f"📥 Download {tc['id']} Spec",
+                            data=st.session_state.unit_test_specs[tc['id']],
+                            file_name=f"{tc['id']}_unit_test_spec.md",
+                            mime="text/markdown",
+                            key=f"dl_spec_{tc['id']}"
+                        )
+            
+            # Download all specifications as a single file
+            all_specs = "\n\n---\n\n".join([
+                f"# {tc['id']}: {tc['title']}\n\n{st.session_state.unit_test_specs.get(tc['id'], '')}"
+                for tc in st.session_state.selected_test_cases
+            ])
+            st.download_button(
+                label="📥 Download All Specifications",
+                data=all_specs,
+                file_name="unit_test_specifications.md",
+                mime="text/markdown",
+                key="dl_all_specs",
+            )
+        
+        # Display automation code for Selenium/REST Assured
+        if st.session_state.get('automation_code'):
             # Combined Test Suite View
             if st.session_state.generation_mode == "Combined Test Suite" and "combined" in st.session_state.automation_code:
                 st.markdown("### 🧩 Combined Test Suite")
@@ -2104,11 +3181,12 @@ elif page == "Test Automation":
                 
                 zip_buffer.seek(0)
                 st.download_button(
-                    label="Download Combined Test Suite",
+                    label="📥 Download Combined Test Suite (.zip)",
                     data=zip_buffer,
                     file_name="CombinedTestSuite.zip",
                     mime="application/zip",
-                    use_container_width=True
+                    use_container_width=True,
+                    key="dl_combined_suite"
                 )
                 
                 # Display test cases in suite
@@ -2160,11 +3238,12 @@ elif page == "Test Automation":
                             
                             zip_buffer.seek(0)
                             st.download_button(
-                                label=f"Download Code for {test_case['id']}",
+                                label=f"📥 Download Code for {test_case['id']} (.zip)",
                                 data=zip_buffer,
                                 file_name=f"{test_case['id']}_automation.zip",
                                 mime="application/zip",
-                                use_container_width=True
+                                use_container_width=True,
+                                key=f"dl_code_{test_case['id']}"
                             )
                         else:
                             st.info("Click 'Generate Automation Code' to create Java code")
@@ -2431,6 +3510,120 @@ IMPORTANT: Use proper Markdown formatting with tables, headers, and bullet point
         
         # Disclaimer
         st.info("⚠️ **AI-Generated Content**: This test plan was generated by AI. Please review and adjust according to your specific project needs.")
+
+# Bug Report Generator Page
+elif page == "Bug Report Generator":
+    st.subheader("🐞 AI Bug Report Generator")
+    st.info("Describe the bug in plain English or Arabic. select the **Output Language** below (Default: English).")
+    
+    col_input, col_preview = st.columns([1, 1])
+    
+    with col_input:
+        st.markdown("### 📝 Bug Details")
+        
+        # Context Fields
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            env = st.selectbox("Environment", ["PROD", "UAT", "Testing", "Staging", "DEV"], index=2)
+        with c2:
+            browser = st.selectbox("Browser", ["Chrome", "Edge", "Firefox", "Safari", "Mobile"], index=0)
+        with c3:
+            report_lang = st.selectbox("Output Language", ["English", "Arabic (العربية)"], index=0)
+        
+        # Description
+        bug_description = st.text_area(
+            "What happened? (Rough Notes)", 
+            placeholder="e.g. I tried to login... OR \nمثال: حاولت تسجيل الدخول...",
+            height=300
+        )
+        
+        # Screenshot (Visual only for now, unless we verify vision model availability)
+        uploaded_screenshot = st.file_uploader("Upload Screenshot (Optional)", type=['png', 'jpg', 'jpeg'])
+
+        generate_btn = st.button("🚀 Generate Bug Report", use_container_width=True, disabled=not bug_description)
+
+    with col_preview:
+        st.markdown("### 📋 Formatted Report")
+        
+        if generate_btn and bug_description:
+            with st.spinner("Analyzing and formatting bug report..."):
+                try:
+                    # Construct Prompt
+                    prompt = f"""
+                    Act as a Senior QA Engineer. Convert this unstructured bug description into a standard, professional Bug Report for JIRA/DevOps.
+                    
+                    CONTEXT:
+                    Environment: {env}
+                    Browser: {browser}
+                    Target Language: {report_lang}
+                    
+                    UNSTRUCTURED INPUT:
+                    {bug_description}
+                    
+                    INSTRUCTIONS:
+                    1. Create a clear, concise Title.
+                    2. Estimate Severity and Priority based on the context.
+                    3. Extract clear Steps to Reproduce.
+                    4. Clearly separate Expected and Actual results.
+                    5. Use professional technical language.
+                    6. LANGUAGE HANDLING:
+                       - If Target Language is English: TRANSLATE any non-English input (like Arabic) into professional English.
+                       - If Target Language is Arabic: Translate content to professional technical Arabic, keeping technical terms in English.
+                    
+                    OUTPUT FORMAT (Markdown):
+                    ### [Bug ID]: [Concise Title in Target Language]
+                    
+                    **Severity**: [Critical/High/Medium/Low] | **Priority**: [High/Medium/Low]
+                    
+                    **Description**:
+                    [Professional summary of the issue]
+                    
+                    **Preconditions**:
+                    [Any implied setup]
+                    
+                    **Steps to Reproduce**:
+                    1. [Step 1]
+                    2. [Step 2]
+                    ...
+                    
+                    **Actual Result**:
+                    [What happened]
+                    
+                    **Expected Result**:
+                    [What should have happened]
+                    
+                    **Environment details**:
+                    {env} | {browser}
+                    """
+                    
+                    report = call_ai(prompt)
+                    st.session_state.last_bug_report = report
+                    
+                    # Increment counter
+                    if 'bug_reports_count' not in st.session_state:
+                        st.session_state.bug_reports_count = 0
+                    st.session_state.bug_reports_count += 1
+                    
+                    st.toast("✅ Bug Report Generated!")
+                    
+                except Exception as e:
+                    st.error(f"Error generating report: {e}")
+
+        if "last_bug_report" in st.session_state:
+             # Display the markdown report
+             st.markdown(st.session_state.last_bug_report)
+             
+             st.markdown("---")
+             st.caption("Copy for JIRA / DevOps /RTC:")
+             st.code(st.session_state.last_bug_report, language='markdown')
+             
+             # Export Options
+             st.download_button(
+                 "📥 Download Report (.md)",
+                 data=st.session_state.last_bug_report,
+                 file_name=f"Bug_Report_{int(time.time())}.md",
+                 mime="text/markdown"
+             )
 
 # AI Chat Page
 elif page == "AI Chat":
