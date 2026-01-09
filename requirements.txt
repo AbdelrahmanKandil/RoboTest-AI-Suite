@@ -11,4 +11,3 @@ exception
 python-docx
 firebase-admin
 google-genai
-
