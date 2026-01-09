@@ -23,7 +23,12 @@ st.set_page_config(
     page_title="RoboTest AI Suite",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.linkedin.com/in/abdulrahman-kandil/',
+        'Report a bug': "mailto:abdelrahmankandil50@gmail.com",
+        'About': "# RoboTest AI Suite\nPowered by Advanced Agentic AI"
+    }
 )
 
 # Configure AI Providers
@@ -854,6 +859,23 @@ st.markdown("""
     margin-bottom: 10px;
 }
 </style>
+<style>
+/* Animation classes */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Hover effects for cards */
+div[data-testid="column"] > div > div > div > div.step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Add Sumerge logo to sidebar
@@ -879,16 +901,24 @@ page = page.split(" ", 1)[1] if " " in page else page
 if page == "Home":
     # Welcome Section
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                padding: 30px; border-radius: 15px; color: white; text-align: center; margin-bottom: 30px;">
-        <h2 style="margin-top: 0; font-size: 2em;">🚀 Welcome to Intelligent Test Automation</h2>
-        <p style="font-size: 1.1em; margin-bottom: 0;">
-            Generate professional test cases and enterprise-grade Selenium automation code
+    <div class="animate-fade-in" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                padding: 40px; border-radius: 20px; color: white; text-align: center; margin-bottom: 30px; 
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+        <h1 style="margin-top: 0; font-size: 2.8em; font-weight: 700;">🚀 Welcome to RoboTest AI Suite</h1>
+        <p style="font-size: 1.3em; margin-bottom: 20px; opacity: 0.9;">
+            The Intelligent AI-Powered QA Platform
         </p>
-        <p style="font-size: 1.1em; margin-bottom: 0;">
-            Transform your testing workflow with AI-powered automation. 
-            From test case generation to complete framework deployment.
-        </p>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <div style="background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; backdrop-filter: blur(5px);">
+                🤖 Test Generation
+            </div>
+            <div style="background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; backdrop-filter: blur(5px);">
+                ⚡ Auto-Automation
+            </div>
+            <div style="background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 30px; backdrop-filter: blur(5px);">
+                💬 AI Assistant
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -959,30 +989,36 @@ if page == "Home":
     
     with steps_col1:
         st.markdown("""
-        <div style="text-align: center; padding: 20px; background-color: #e3f2fd; border-radius: 10px;">
+        <div class="step-card" style="text-align: center; padding: 20px; background-color: #e3f2fd; border-radius: 10px; height: 100%; transition: transform 0.3s;">
             <div style="font-size: 3em;">🤖</div>
             <h4 style="color: #1976d2;">Step 1: Generate</h4>
             <p>Use the <strong>Test Case Generator</strong> to create test cases from your requirements</p>
         </div>
         """, unsafe_allow_html=True)
+        st.button("Go to Generator", key="nav_gen_btn", use_container_width=True, 
+                 on_click=lambda: st.session_state.update(main_navigation="🧪 Test Case Generator"))
     
     with steps_col2:
         st.markdown("""
-        <div style="text-align: center; padding: 20px; background-color: #f3e5f5; border-radius: 10px;">
+        <div class="step-card" style="text-align: center; padding: 20px; background-color: #f3e5f5; border-radius: 10px; height: 100%; transition: transform 0.3s;">
             <div style="font-size: 3em;">⚡</div>
             <h4 style="color: #7b1fa2;">Step 2: Automate</h4>
             <p>Visit <strong>Test Automation</strong> to generate Java Selenium automation code</p>
         </div>
         """, unsafe_allow_html=True)
+        st.button("Go to Automation", key="nav_auto_btn", use_container_width=True,
+                 on_click=lambda: st.session_state.update(main_navigation="🤖 Test Automation"))
     
     with steps_col3:
         st.markdown("""
-        <div style="text-align: center; padding: 20px; background-color: #e8f5e9; border-radius: 10px;">
+        <div class="step-card" style="text-align: center; padding: 20px; background-color: #e8f5e9; border-radius: 10px; height: 100%; transition: transform 0.3s;">
             <div style="font-size: 3em;">🎯</div>
             <h4 style="color: #388e3c;">Step 3: Execute</h4>
             <p>Download your framework and run automated tests in your environment</p>
         </div>
         """, unsafe_allow_html=True)
+        st.button("Go to Test Plan", key="nav_plan_btn", use_container_width=True,
+                 on_click=lambda: st.session_state.update(main_navigation="📋 Test Plan Generator"))
     
     # AI Provider Status
     st.markdown("---")
