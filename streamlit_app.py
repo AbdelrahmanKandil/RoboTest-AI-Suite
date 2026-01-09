@@ -213,8 +213,8 @@ def call_ai(prompt, provider=None):
             try:
                 return call_openai(prompt)
             except Exception as e:
+                st.warning("⚠️ OpenAI failed. Trying next provider...")
                 errors.append(f"OpenAI: {str(e)}")
-                raise e
         
         if GITHUB_TOKEN:
             try:
@@ -1715,7 +1715,7 @@ elif page == "Test Case Generator":
                 with b_col1:
                     if st.button(f"🚀 Automate ({selected_count})", key="gen_selected"):
                         st.session_state.selected_test_cases = selected_cases
-                        st.session_state.main_navigation = "🤖 Test Automation"
+                        st.session_state.nav_radio_widget = "🤖 Test Automation"
                         st.rerun()
                 
                 with b_col2:
@@ -1852,12 +1852,6 @@ elif page == "Test Case Generator":
                     if st.button("✏️ Edit", key=f"edit_{test_case['id']}"):
                         st.session_state.editing_test_case = test_case
                         st.session_state.editing_index = idx
-                    
-                    # Generate automation for single test case
-                    if st.button("🤖 Generate", key=f"gen_single_{test_case['id']}"):
-                        st.session_state.selected_test_cases = [test_case]
-                        st.experimental_set_query_params(page="Test Automation")
-                        st.rerun()
         
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -1967,7 +1961,7 @@ elif page == "Test Case Generator":
                     file_name=f"{ls_case['id']}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True,
-                    key="dl_single_excel"
+                    key="dl_single_excel_edit"
                 )
 
             with ps_col2:
@@ -2180,7 +2174,7 @@ elif page == "Test Automation":
         st.info("No test cases selected for automation")
         st.markdown("Go to **Test Case Generator** to create and select test cases")
         if st.button("Go to Test Case Generator"):
-            st.experimental_set_query_params(page="Test Case Generator")
+            st.query_params["page"] = "Test Case Generator"
             st.rerun()
 
 # Test Plan Generator Page
@@ -2615,17 +2609,18 @@ if page != "AI Chat":
     """, unsafe_allow_html=True)
 # --- GLOBAL SIDEBAR CONFIGURATION (RENDERED LAST) ---
 # This ensures it appears below any page-specific sidebar content
-# Only show on Home page
-if page == "Home":
-    st.sidebar.markdown("---")
+st.sidebar.markdown("---")
 
-    # User API Key Inputs
-    with st.sidebar.expander("🔑 API Configuration", expanded=False):
-        st.caption("Enter your own API keys to override defaults. Keys are not saved to disk.")
-        st.text_input("Gemini API Key", key="user_gemini_key", type="password", help="Overrides GEMINI_API_KEY from .env")
-        st.text_input("OpenAI API Key", key="user_openai_key", type="password", help="Overrides OPENAI_API_KEY from .env")
-        st.text_input("Anthropic API Key", key="user_anthropic_key", type="password", help="Overrides ANTHROPIC_API_KEY from .env")
-        st.text_input("GitHub Token", key="user_github_token", type="password", help="Overrides GITHUB_TOKEN from .env")
+# User API Key Inputs - Available on all pages
+with st.sidebar.expander("🔑 API Configuration", expanded=False):
+    st.caption("Enter your own API keys to override defaults. Keys are not saved to disk.")
+    st.text_input("Gemini API Key", key="user_gemini_key", type="password", help="Overrides GEMINI_API_KEY from .env")
+    st.text_input("OpenAI API Key", key="user_openai_key", type="password", help="Overrides OPENAI_API_KEY from .env")
+    st.text_input("Anthropic API Key", key="user_anthropic_key", type="password", help="Overrides ANTHROPIC_API_KEY from .env")
+    st.text_input("GitHub Token", key="user_github_token", type="password", help="Overrides GITHUB_TOKEN from .env")
+
+# Only show provider selection on Home page
+if page == "Home":
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### ⚙️ AI Provider")
