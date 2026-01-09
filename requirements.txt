@@ -11,3 +11,6 @@ exception
 python-docx
 firebase-admin
 google-genai
+gspread
+google-auth-oauthlib
+google-auth
