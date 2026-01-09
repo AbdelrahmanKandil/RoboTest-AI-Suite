@@ -31,7 +31,7 @@ This app leverages **multiple AI providers** with automatic fallback support, pr
 
 - **Auto-Fallback Mode:** Automatically tries providers in order (Gemini → Claude → OpenAI → GitHub) if one fails or quota is exceeded
 - **Manual Selection:** Choose your preferred AI provider from the sidebar
-- **Multi-Provider Support:** Configure one or all API keys based on your needs
+- **Multi-Provider Support:** Configure API keys via `.env` file or directly in the UI (Sidebar inputs override `.env`).
 - **GitHub Models (Copilot):** Use your GitHub PAT (`GITHUB_TOKEN`) and set `GITHUB_MODEL` (e.g., `openai/gpt-4o-mini` or `gpt-5` if available) to run models via GitHub Models API
 
 ---
@@ -285,6 +285,7 @@ See [`requirements.txt`](./requirements.txt):
 ### AI Provider Settings
 - **Auto Mode:** Automatically uses available providers with fallback
 - **Manual Mode:** Select specific provider (Gemini, Claude, or OpenAI)
+- **UI Configuration:** Enter your personal API keys in the sidebar "🔑 API Configuration" expander (overrides environment variables).
 
 ### Test Case Settings
 - **Module Name:** Customize test case ID prefix

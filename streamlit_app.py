@@ -18,11 +18,20 @@ import requests
 # Load environment variables
 load_dotenv()
 
+# Streamlit app configuration
+st.set_page_config(
+    page_title="RoboTest AI Suite",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 # Configure AI Providers
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")  # Claude API Key
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # GitHub PAT with models scope
+# Check session state for user-provided keys, otherwise use environment variables
+GEMINI_API_KEY = st.session_state.get("user_gemini_key", "") or os.getenv("GEMINI_API_KEY")
+OPENAI_API_KEY = st.session_state.get("user_openai_key", "") or os.getenv("OPENAI_API_KEY")
+ANTHROPIC_API_KEY = st.session_state.get("user_anthropic_key", "") or os.getenv("ANTHROPIC_API_KEY")  # Claude API Key
+GITHUB_TOKEN = st.session_state.get("user_github_token", "") or os.getenv("GITHUB_TOKEN")  # GitHub PAT with models scope
 GITHUB_MODEL = os.getenv("GITHUB_MODEL", "openai/gpt-4o-mini")  # e.g., openai/gpt-4o, openai/gpt-4.1, or gpt-5 if available
 
 # Initialize Gemini client if available
@@ -209,16 +218,9 @@ def call_github(prompt):
 
 # Check if at least one API key is available
 if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY and not GITHUB_TOKEN:
-    st.error("⚠️ No AI providers configured! Please set at least one of these in your .env file:\n- GEMINI_API_KEY\n- OPENAI_API_KEY\n- ANTHROPIC_API_KEY\n- GITHUB_TOKEN (PAT with models scope)")
-    st.stop()
+    # Do not stop the app; allow user to enter keys in the sidebar
+    pass
 
-# Streamlit app configuration
-st.set_page_config(
-    page_title="RoboTest AI Suite",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Custom CSS for styling
 st.markdown("""
@@ -232,6 +234,11 @@ st.markdown("""
     --light: #f8f8f8;
     --gray: #e0e0e0;
     --warning: #ff9800;
+}
+/* Hide default password reveal button in Edge/Internet Explorer */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
 .header {
     color: var(--primary);
@@ -576,7 +583,9 @@ FILE_PROCESSORS = {
     "application/pdf": extract_text_from_pdf,
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document": extract_text_from_docx,
     "text/csv": extract_text_from_csv,
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": extract_text_from_xlsx
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": extract_text_from_xlsx,
+    "text/markdown": extract_text_from_txt,  # Markdown is text
+    "application/octet-stream": extract_text_from_txt # Fallback for some md files type detection
 }
 
 # Function to generate test cases with Gemini
@@ -864,137 +873,7 @@ page = st.sidebar.radio(
 page = page.split(" ", 1)[1] if " " in page else page
 
 # AI Provider Configuration in Sidebar
-st.sidebar.markdown("---")
-st.sidebar.markdown("### ⚙️ AI Provider")
-
-# Build provider options based on available API keys
-provider_options = ["Auto (Recommended)"]
-provider_values = ["auto"]
-if GEMINI_API_KEY:
-    provider_options.append("Google Gemini")
-    provider_values.append("gemini")
-if ANTHROPIC_API_KEY:
-    provider_options.append("Claude (Anthropic)")
-    provider_values.append("claude")
-if OPENAI_API_KEY:
-    provider_options.append("OpenAI (ChatGPT)")
-    provider_values.append("openai")
-if GITHUB_TOKEN:
-    provider_options.append("GitHub Models (Copilot)")
-    provider_values.append("github")
-
-selected_provider_idx = st.sidebar.selectbox(
-    "Select AI Provider",
-    range(len(provider_options)),
-    format_func=lambda x: provider_options[x],
-    index=0,
-    help="Auto mode tries providers in order: Gemini → Claude → OpenAI → GitHub"
-)
-st.session_state.ai_provider = provider_values[selected_provider_idx]
-
-# GitHub Models dropdown (shown when GitHub is selected)
-if st.session_state.ai_provider == "github":
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🤖 GitHub Model Selection")
-    
-    # List of all available GitHub Models
-    github_models = [
-        # OpenAI GPT Models
-        "openai/gpt-5",
-        "openai/gpt-5-chat",
-        "openai/gpt-5-mini",
-        "openai/gpt-5-nano",
-        "openai/gpt-4.1",
-        "openai/gpt-4.1-mini",
-        "openai/gpt-4.1-nano",
-        "openai/gpt-4o",
-        "openai/gpt-4o-mini",
-        # OpenAI Reasoning Models
-        "openai/o1",
-        "openai/o1-mini",
-        "openai/o1-preview",
-        "openai/o3",
-        "openai/o3-mini",
-        "openai/o4-mini",
-        # OpenAI Embedding Models
-        "openai/text-embedding-3-small",
-        "openai/text-embedding-3-large",
-        # Microsoft Phi Models
-        "microsoft/phi-4",
-        "microsoft/phi-4-mini-instruct",
-        "microsoft/phi-4-mini-reasoning",
-        "microsoft/phi-4-multimodal-instruct",
-        "microsoft/phi-4-reasoning",
-        "microsoft/phi-3-medium-128k-instruct",
-        "microsoft/phi-3-mini-128k-instruct",
-        # Microsoft Reasoning Models
-        "microsoft/mai-ds-r1",
-        # AI21 Labs Models
-        "ai21/jamba-1.5-large",
-        # Meta Llama Models
-        "meta/llama-4-scout-17b-16e-instruct",
-        "meta/llama-4-maverick-17b-128e-instruct-fp8",
-        "meta/llama-3.3-70b-instruct",
-        "meta/llama-3.2-90b-vision-instruct",
-        "meta/llama-3.2-11b-vision-instruct",
-        "meta/llama-3.1-405b-instruct",
-        "meta/llama-3.1-70b-instruct",
-        "meta/llama-3.1-8b-instruct",
-        # Cohere Models
-        "cohere/command-r-plus-08-2024",
-        "cohere/command-r-08-2024",
-        "cohere/command-a",
-        # Mistral AI Models
-        "mistralai/mistral-small-3.1",
-        "mistralai/codestral-25.01",
-        "mistralai/mistral-medium-3",
-        "mistralai/ministral-3b",
-        "mistralai/mistral-large",
-        "mistralai/mistral-nemo",
-        # DeepSeek Models
-        "deepseek/deepseek-v3-0324",
-        "deepseek/deepseek-r1-0528",
-        "deepseek/deepseek-r1",
-        # xAI Grok Models
-        "xai/grok-3",
-        "xai/grok-3-mini",
-        # Google Gemma Models
-        "google/gemma-2-27b-it",
-        "google/gemma-2-9b-it",
-    ]
-    
-    selected_model = st.sidebar.selectbox(
-        "Choose Model",
-        github_models,
-        index=github_models.index(GITHUB_MODEL) if GITHUB_MODEL in github_models else 0,
-        help="Select a model from the GitHub Models marketplace. Visit https://github.com/marketplace?type=models for available models."
-    )
-    
-    # Update session state with selected model
-    st.session_state.github_model = selected_model
-    
-    st.sidebar.info(f"📌 Selected: `{selected_model}`")
-
-# Show API status
-st.sidebar.markdown("**API Status:**")
-if GEMINI_API_KEY:
-    st.sidebar.markdown("✅ Gemini API configured")
-else:
-    st.sidebar.markdown("❌ Gemini API not configured")
-if ANTHROPIC_API_KEY:
-    st.sidebar.markdown("✅ Claude API configured")
-else:
-    st.sidebar.markdown("❌ Claude API not configured")
-if OPENAI_API_KEY:
-    st.sidebar.markdown("✅ OpenAI API configured")
-else:
-    st.sidebar.markdown("❌ OpenAI API not configured")
-if GITHUB_TOKEN:
-    st.sidebar.markdown("✅ GitHub Models configured")
-else:
-    st.sidebar.markdown("❌ GitHub Models not configured")
-
-st.sidebar.caption("💡 Add API keys to your `.env` file")
+# API Configuration moved to only show on Home page (see end of file)
 
 # Home Page
 if page == "Home":
@@ -1109,7 +988,7 @@ if page == "Home":
     st.markdown("---")
     st.markdown("### 🤖 AI Robot Status")
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         if GEMINI_API_KEY:
             st.markdown("""
@@ -1164,10 +1043,30 @@ if page == "Home":
             </div>
             """, unsafe_allow_html=True)
 
+    with col4:
+        if GITHUB_TOKEN:
+            st.markdown("""
+            <div style="background-color: #c8e6c9; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em;">🐙✅</div>
+                <h5 style="color: #2e7d32; margin: 10px 0;">GitHub Copilot</h5>
+                <p style="color: #1b5e20; margin: 0;">Online & Ready</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color: #f3e5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em;">🐙💤</div>
+                <h5 style="color: #7b1fa2; margin: 10px 0;">GitHub Copilot</h5>
+                <p style="color: #4a148c; margin: 0;">Sleeping - Not Configured</p>
+            </div>
+            """, unsafe_allow_html=True)
+
 # Test Case Generator Page
 elif page == "Test Case Generator":
     # Show any pending toast messages at start of page
     show_pending_toast()
+    
+    st.subheader("🧪 Test Case Generator")
     
     with st.sidebar:
         st.header("Configuration")
@@ -1207,7 +1106,26 @@ elif page == "Test Case Generator":
         st.markdown("**About**")
         st.markdown("Create professional test cases using AI")
     
-    st.subheader("🧪 Test Case Generator")
+        # Move API Configuration down, but keep it accessible if needed here or handle via main sidebar area logic
+        # Ideally, general config should be global, but if specific to this page, keep here.
+        # User requested moving these ABOVE the API provider. 
+        # Since API provider is in the global sidebar (lines 875-1017), we need to restructure the global sidebar code
+        # or inject these settings earlier.
+        
+        # ACTUALLY, the better approach is to move the global API configuration block (lines 875-1017) 
+        # to AFTER the page-specific sidebar content, OR move this page-specific content to the top of the sidebar.
+        # The user wants "Configuration... to be above api provider".
+        
+        # Let's remove this block from here and instead add it to the top global sidebar area or 
+        # use `st.sidebar` order. Streamlit renders sidebar elements in order of execution.
+        # Currently, global sidebar (nav & API) runs FIRST (lines 853-1017).
+        # This block runs only when page == "Test Case Generator".
+        
+        # To fix this, we need to restructure:
+        # 1. Navigation (Top)
+        # 2. Page Specific Settings (Middle) -> We need to move the API config code to run AFTER the page logic check.
+        # 3. API Config (Bottom)
+
     
     tab1, tab2 = st.tabs(["Manual Creation", "Generate from Requirements"])
     
@@ -1321,8 +1239,9 @@ elif page == "Test Case Generator":
         # File upload section
         st.markdown("**Upload Requirements Document (Optional)**")
         uploaded_files = st.file_uploader(
-            "Upload requirements files (PDF, DOCX, TXT, CSV, XLSX)", 
+            "Upload requirements files (PDF, DOCX, TXT, CSV, XLSX, MD)", 
             accept_multiple_files=True,
+            type=['pdf', 'docx', 'txt', 'csv', 'xlsx', 'md'],
             key="requirements_uploader"
         )
         
@@ -2079,6 +1998,10 @@ elif page == "AI Chat":
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
     
+    # Initialize file uploader key
+    if 'file_uploader_key' not in st.session_state:
+        st.session_state.file_uploader_key = 0
+
     # Custom CSS for chat
     st.markdown("""
     <style>
@@ -2124,22 +2047,64 @@ elif page == "AI Chat":
     if st.session_state.chat_messages:
         if st.button("🗑️ Clear Chat History", key="clear_chat_main"):
             st.session_state.chat_messages = []
+            # Reset file uploader by changing its key
+            st.session_state.file_uploader_key += 1
             st.rerun()
     
+    # File Uploader in main area
+    with st.expander("📎 Attach File to Message", expanded=False):
+        st.caption("Upload a file to provide context for your next question.")
+        chat_context_file = st.file_uploader(
+            "Choose file", 
+            type=['pdf', 'docx', 'txt', 'csv', 'xlsx', 'md'],
+            key=f"chat_file_uploader_{st.session_state.file_uploader_key}",
+            label_visibility="collapsed"
+        )
+
     # Chat input using Streamlit's chat_input (auto-clears after send, no page reload feel)
     user_input = st.chat_input("Ask me anything about testing, automation, QA...")
     
     # Process message
     if user_input:
+        # Check for uploaded file in sidebar
+        chat_context_file = st.session_state.get(f'chat_file_uploader_{st.session_state.file_uploader_key}')
+        file_context = ""
+        
+        if chat_context_file:
+            try:
+                # Determine file type and process
+                file_type = chat_context_file.type
+                # Simple extension check for markdown if type is generic or missing
+                if chat_context_file.name.lower().endswith('.md'):
+                     file_type = "text/markdown"
+                
+                if file_type in FILE_PROCESSORS:
+                    content = FILE_PROCESSORS[file_type](chat_context_file)
+                    file_context = f"\n\n--- ATTACHED FILE: {chat_context_file.name} ---\n{content}\n-----------------------------\n"
+                elif file_type.startswith('text/'):
+                     # Try treating as text
+                     content = chat_context_file.read().decode("utf-8")
+                     file_context = f"\n\n--- ATTACHED FILE: {chat_context_file.name} ---\n{content}\n-----------------------------\n"
+                
+                if file_context:
+                    st.session_state.chat_messages.append({"role": "system", "content": f"📎 Attached context from file: **{chat_context_file.name}**"})
+            except Exception as e:
+                st.error(f"Error reading file: {str(e)}")
+
         # Add user message to history
         st.session_state.chat_messages.append({"role": "user", "content": user_input})
         
         # Build conversation context
         conversation_context = "You are a helpful AI assistant specializing in QA, testing, and software development. Be conversational, friendly, and helpful.\n\n"
         
+        # Add file context if available
+        if file_context:
+             conversation_context += f"USER ATTACHED A FILE. HERE IS THE CONTENT:\n{file_context}\n\n"
+        
         # Include recent conversation history (last 10 messages for context)
         recent_messages = st.session_state.chat_messages[-10:]
         for msg in recent_messages[:-1]:  # Exclude the latest user message as it's already in prompt
+            if msg["role"] == "system": continue # Skip system messages in prompt context to avoid confusion
             role = "User" if msg["role"] == "user" else "Assistant"
             conversation_context += f"{role}: {msg['content']}\n\n"
         
@@ -2162,9 +2127,10 @@ elif page == "AI Chat":
         st.markdown("### 💬 Chat Options")
         if st.button("🗑️ Clear Chat History", use_container_width=True):
             st.session_state.chat_messages = []
+            # Reset file uploader by changing its key
+            st.session_state.file_uploader_key += 1
             st.rerun()
         
-        st.markdown(f"**Messages:** {len(st.session_state.chat_messages)}")
         
         # Example prompts
         st.markdown("**Quick Prompts:**")
@@ -2198,3 +2164,153 @@ if page != "AI Chat":
         </p>
     </div>
     """, unsafe_allow_html=True)
+# --- GLOBAL SIDEBAR CONFIGURATION (RENDERED LAST) ---
+# This ensures it appears below any page-specific sidebar content
+# Only show on Home page
+if page == "Home":
+    st.sidebar.markdown("---")
+
+    # User API Key Inputs
+    with st.sidebar.expander("🔑 API Configuration", expanded=False):
+        st.caption("Enter your own API keys to override defaults. Keys are not saved to disk.")
+        st.text_input("Gemini API Key", key="user_gemini_key", type="password", help="Overrides GEMINI_API_KEY from .env")
+        st.text_input("OpenAI API Key", key="user_openai_key", type="password", help="Overrides OPENAI_API_KEY from .env")
+        st.text_input("Anthropic API Key", key="user_anthropic_key", type="password", help="Overrides ANTHROPIC_API_KEY from .env")
+        st.text_input("GitHub Token", key="user_github_token", type="password", help="Overrides GITHUB_TOKEN from .env")
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### ⚙️ AI Provider")
+
+    # Build provider options based on available API keys
+    provider_options = ["Auto (Recommended)"]
+    provider_values = ["auto"]
+    if GEMINI_API_KEY:
+        provider_options.append("Google Gemini")
+        provider_values.append("gemini")
+    if ANTHROPIC_API_KEY:
+        provider_options.append("Claude (Anthropic)")
+        provider_values.append("claude")
+    if OPENAI_API_KEY:
+        provider_options.append("OpenAI (ChatGPT)")
+        provider_values.append("openai")
+    if GITHUB_TOKEN:
+        provider_options.append("GitHub Models (Copilot)")
+        provider_values.append("github")
+
+    # Ensure provider is valid (in case keys changed)
+    current_provider_idx = 0
+    if st.session_state.ai_provider in provider_values:
+        current_provider_idx = provider_values.index(st.session_state.ai_provider)
+
+    selected_provider_idx = st.sidebar.selectbox(
+        "Select AI Provider",
+        range(len(provider_options)),
+        format_func=lambda x: provider_options[x],
+        index=current_provider_idx,
+        help="Auto mode tries providers in order: Gemini → Claude → OpenAI → GitHub"
+    )
+    st.session_state.ai_provider = provider_values[selected_provider_idx]
+
+    # GitHub Models dropdown (shown when GitHub is selected)
+    if st.session_state.ai_provider == "github":
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("### 🤖 GitHub Model Selection")
+        
+        # List of all available GitHub Models
+        github_models = [
+            # OpenAI GPT Models
+            "openai/gpt-5",
+            "openai/gpt-5-chat",
+            "openai/gpt-5-mini",
+            "openai/gpt-5-nano",
+            "openai/gpt-4.1",
+            "openai/gpt-4.1-mini",
+            "openai/gpt-4.1-nano",
+            "openai/gpt-4o",
+            "openai/gpt-4o-mini",
+            # OpenAI Reasoning Models
+            "openai/o1",
+            "openai/o1-mini",
+            "openai/o1-preview",
+            "openai/o3",
+            "openai/o3-mini",
+            "openai/o4-mini",
+            # OpenAI Embedding Models
+            "openai/text-embedding-3-small",
+            "openai/text-embedding-3-large",
+            # Microsoft Phi Models
+            "microsoft/phi-4",
+            "microsoft/phi-4-mini-instruct",
+            "microsoft/phi-4-mini-reasoning",
+            "microsoft/phi-4-multimodal-instruct",
+            "microsoft/phi-4-reasoning",
+            "microsoft/phi-3-medium-128k-instruct",
+            "microsoft/phi-3-mini-128k-instruct",
+            # Microsoft Reasoning Models
+            "microsoft/mai-ds-r1",
+            # AI21 Labs Models
+            "ai21/jamba-1.5-large",
+            # Meta Llama Models
+            "meta/llama-4-scout-17b-16e-instruct",
+            "meta/llama-4-maverick-17b-128e-instruct-fp8",
+            "meta/llama-3.3-70b-instruct",
+            "meta/llama-3.2-90b-vision-instruct",
+            "meta/llama-3.2-11b-vision-instruct",
+            "meta/llama-3.1-405b-instruct",
+            "meta/llama-3.1-70b-instruct",
+            "meta/llama-3.1-8b-instruct",
+            # Cohere Models
+            "cohere/command-r-plus-08-2024",
+            "cohere/command-r-08-2024",
+            "cohere/command-a",
+            # Mistral AI Models
+            "mistralai/mistral-small-3.1",
+            "mistralai/codestral-25.01",
+            "mistralai/mistral-medium-3",
+            "mistralai/ministral-3b",
+            "mistralai/mistral-large",
+            "mistralai/mistral-nemo",
+            # DeepSeek Models
+            "deepseek/deepseek-v3-0324",
+            "deepseek/deepseek-r1-0528",
+            "deepseek/deepseek-r1",
+            # xAI Grok Models
+            "xai/grok-3",
+            "xai/grok-3-mini",
+            # Google Gemma Models
+            "google/gemma-2-27b-it",
+            "google/gemma-2-9b-it",
+        ]
+        
+        selected_model = st.sidebar.selectbox(
+            "Choose Model",
+            github_models,
+            index=github_models.index(GITHUB_MODEL) if GITHUB_MODEL in github_models else 0,
+            help="Select a model from the GitHub Models marketplace. Visit https://github.com/marketplace?type=models for available models."
+        )
+        
+        # Update session state with selected model
+        st.session_state.github_model = selected_model
+        
+        st.sidebar.info(f"📌 Selected: `{selected_model}`")
+
+    # Show API status
+    st.sidebar.markdown("**API Status:**")
+    if GEMINI_API_KEY:
+        st.sidebar.markdown("✅ Gemini API configured")
+    else:
+        st.sidebar.markdown("❌ Gemini API not configured")
+    if ANTHROPIC_API_KEY:
+        st.sidebar.markdown("✅ Claude API configured")
+    else:
+        st.sidebar.markdown("❌ Claude API not configured")
+    if OPENAI_API_KEY:
+        st.sidebar.markdown("✅ OpenAI API configured")
+    else:
+        st.sidebar.markdown("❌ OpenAI API not configured")
+    if GITHUB_TOKEN:
+        st.sidebar.markdown("✅ GitHub Models configured")
+    else:
+        st.sidebar.markdown("❌ GitHub Models not configured")
+
+    st.sidebar.caption("💡 Add API keys to your `.env` file")
