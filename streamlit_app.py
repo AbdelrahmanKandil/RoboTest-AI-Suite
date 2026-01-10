@@ -1718,7 +1718,7 @@ if page == "Home":
         </div>
         """, unsafe_allow_html=True)
         st.button("Go to Generator", key="nav_gen_btn", use_container_width=True, 
-                 on_click=lambda: st.session_state.update(main_navigation="🧪 Test Case Generator"))
+                 on_click=lambda: st.session_state.update(main_navigation="🧪 Test Case Generator", nav_radio_widget="🧪 Test Case Generator"))
     
     with steps_col2:
         st.markdown("""
@@ -1729,7 +1729,7 @@ if page == "Home":
         </div>
         """, unsafe_allow_html=True)
         st.button("Go to Automation", key="nav_auto_btn", use_container_width=True,
-                 on_click=lambda: st.session_state.update(main_navigation="🤖 Test Automation"))
+                 on_click=lambda: st.session_state.update(main_navigation="🤖 Test Automation", nav_radio_widget="🤖 Test Automation"))
     
     with steps_col3:
         st.markdown("""
@@ -1740,7 +1740,7 @@ if page == "Home":
         </div>
         """, unsafe_allow_html=True)
         st.button("Go to Test Plan", key="nav_plan_btn", use_container_width=True,
-                 on_click=lambda: st.session_state.update(main_navigation="📋 Test Plan Generator"))
+                 on_click=lambda: st.session_state.update(main_navigation="📋 Test Plan Generator", nav_radio_widget="📋 Test Plan Generator"))
     
     # AI Provider Status
     st.markdown("---")
