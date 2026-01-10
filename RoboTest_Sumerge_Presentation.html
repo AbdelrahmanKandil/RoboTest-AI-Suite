@@ -1,0 +1,2320 @@
+<html lang="en">
+
+<head>
+
+    <script class="injected-ffc2e83d85">
+        (function () {
+            'use strict'; function q(b) { var c = 0; return function () { return c < b.length ? { done: !1, value: b[c++] } : { done: !0 } } } function t(b) { var c = typeof Symbol != "undefined" && Symbol.iterator && b[Symbol.iterator]; if (c) return c.call(b); if (typeof b.length == "number") return { next: q(b) }; throw Error(String(b) + " is not an iterable or ArrayLike"); } var u = typeof Object.defineProperties == "function" ? Object.defineProperty : function (b, c, g) { if (b == Array.prototype || b == Object.prototype) return b; b[c] = g.value; return b };
+            function v(b) { b = ["object" == typeof globalThis && globalThis, b, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global]; for (var c = 0; c < b.length; ++c) { var g = b[c]; if (g && g.Math == Math) return g } throw Error("Cannot find global object"); } var w = v(this); function x(b, c) { if (c) a: { var g = w; b = b.split("."); for (var h = 0; h < b.length - 1; h++) { var l = b[h]; if (!(l in g)) break a; g = g[l] } b = b[b.length - 1]; h = g[b]; c = c(h); c != h && c != null && u(g, b, { configurable: !0, writable: !0, value: c }) } }
+            function y() { this.j = !1; this.g = null; this.u = void 0; this.h = 1; this.v = this.l = 0; this.i = null } function z(b) { if (b.j) throw new TypeError("Generator is already running"); b.j = !0 } y.prototype.o = function (b) { this.u = b }; function A(b, c) { b.i = { I: c, J: !0 }; b.h = b.l || b.v } y.prototype.return = function (b) { this.i = { return: b }; this.h = this.v }; function B(b) { this.g = new y; this.h = b } function E(b, c) { z(b.g); var g = b.g.g; if (g) return F(b, "return" in g ? g["return"] : function (h) { return { value: h, done: !0 } }, c, b.g.return); b.g.return(c); return G(b) }
+            function F(b, c, g, h) { try { var l = c.call(b.g.g, g); if (!(l instanceof Object)) throw new TypeError("Iterator result " + l + " is not an object"); if (!l.done) return b.g.j = !1, l; var m = l.value } catch (f) { return b.g.g = null, A(b.g, f), G(b) } b.g.g = null; h.call(b.g, m); return G(b) } function G(b) { for (; b.g.h;)try { var c = b.h(b.g); if (c) return b.g.j = !1, { value: c.value, done: !1 } } catch (g) { b.g.u = void 0, A(b.g, g) } b.g.j = !1; if (b.g.i) { c = b.g.i; b.g.i = null; if (c.J) throw c.I; return { value: c.return, done: !0 } } return { value: void 0, done: !0 } }
+            function H(b) { this.next = function (c) { z(b.g); b.g.g ? c = F(b, b.g.g.next, c, b.g.o) : (b.g.o(c), c = G(b)); return c }; this.throw = function (c) { z(b.g); b.g.g ? c = F(b, b.g.g["throw"], c, b.g.o) : (A(b.g, c), c = G(b)); return c }; this.return = function (c) { return E(b, c) }; this[Symbol.iterator] = function () { return this } } function I(b) { function c(h) { return b.next(h) } function g(h) { return b.throw(h) } return new Promise(function (h, l) { function m(f) { f.done ? h(f.value) : Promise.resolve(f.value).then(c, g).then(m, l) } m(b.next()) }) }
+            x("Symbol", function (b) { function c(m) { if (this instanceof c) throw new TypeError("Symbol is not a constructor"); return new g(h + (m || "") + "_" + l++, m) } function g(m, f) { this.g = m; u(this, "description", { configurable: !0, writable: !0, value: f }) } if (b) return b; g.prototype.toString = function () { return this.g }; var h = "jscomp_symbol_" + (Math.random() * 1E9 >>> 0) + "_", l = 0; return c });
+            x("Symbol.iterator", function (b) { if (b) return b; b = Symbol("Symbol.iterator"); u(Array.prototype, b, { configurable: !0, writable: !0, value: function () { return J(q(this)) } }); return b }); function J(b) { b = { next: b }; b[Symbol.iterator] = function () { return this }; return b }
+            x("Promise", function (b) {
+                function c(f) { this.h = 0; this.i = void 0; this.g = []; this.u = !1; var a = this.j(); try { f(a.resolve, a.reject) } catch (d) { a.reject(d) } } function g() { this.g = null } function h(f) { return f instanceof c ? f : new c(function (a) { a(f) }) } if (b) return b; g.prototype.h = function (f) { if (this.g == null) { this.g = []; var a = this; this.i(function () { a.l() }) } this.g.push(f) }; var l = w.setTimeout; g.prototype.i = function (f) { l(f, 0) }; g.prototype.l = function () {
+                    for (; this.g && this.g.length;) {
+                        var f = this.g; this.g = []; for (var a = 0; a < f.length; ++a) {
+                            var d =
+                                f[a]; f[a] = null; try { d() } catch (e) { this.j(e) }
+                        }
+                    } this.g = null
+                }; g.prototype.j = function (f) { this.i(function () { throw f; }) }; c.prototype.j = function () { function f(e) { return function (k) { d || (d = !0, e.call(a, k)) } } var a = this, d = !1; return { resolve: f(this.D), reject: f(this.l) } }; c.prototype.D = function (f) { if (f === this) this.l(new TypeError("A Promise cannot resolve to itself")); else if (f instanceof c) this.G(f); else { a: switch (typeof f) { case "object": var a = f != null; break a; case "function": a = !0; break a; default: a = !1 }a ? this.C(f) : this.o(f) } };
+                c.prototype.C = function (f) { var a = void 0; try { a = f.then } catch (d) { this.l(d); return } typeof a == "function" ? this.H(a, f) : this.o(f) }; c.prototype.l = function (f) { this.v(2, f) }; c.prototype.o = function (f) { this.v(1, f) }; c.prototype.v = function (f, a) { if (this.h != 0) throw Error("Cannot settle(" + f + ", " + a + "): Promise already settled in state" + this.h); this.h = f; this.i = a; this.h === 2 && this.F(); this.K() }; c.prototype.F = function () { var f = this; l(function () { if (f.B()) { var a = w.console; typeof a !== "undefined" && a.error(f.i) } }, 1) }; c.prototype.B =
+                    function () { if (this.u) return !1; var f = w.CustomEvent, a = w.Event, d = w.dispatchEvent; if (typeof d === "undefined") return !0; typeof f === "function" ? f = new f("unhandledrejection", { cancelable: !0 }) : typeof a === "function" ? f = new a("unhandledrejection", { cancelable: !0 }) : (f = w.document.createEvent("CustomEvent"), f.initCustomEvent("unhandledrejection", !1, !0, f)); f.promise = this; f.reason = this.i; return d(f) }; c.prototype.K = function () { if (this.g != null) { for (var f = 0; f < this.g.length; ++f)m.h(this.g[f]); this.g = null } }; var m = new g; c.prototype.G =
+                        function (f) { var a = this.j(); f.A(a.resolve, a.reject) }; c.prototype.H = function (f, a) { var d = this.j(); try { f.call(a, d.resolve, d.reject) } catch (e) { d.reject(e) } }; c.prototype.then = function (f, a) { function d(n, r) { return typeof n == "function" ? function (C) { try { e(n(C)) } catch (D) { k(D) } } : r } var e, k, p = new c(function (n, r) { e = n; k = r }); this.A(d(f, e), d(a, k)); return p }; c.prototype.catch = function (f) { return this.then(void 0, f) }; c.prototype.A = function (f, a) {
+                            function d() {
+                                switch (e.h) {
+                                    case 1: f(e.i); break; case 2: a(e.i); break; default: throw Error("Unexpected state: " +
+                                        e.h);
+                                }
+                            } var e = this; this.g == null ? m.h(d) : this.g.push(d); this.u = !0
+                        }; c.resolve = h; c.reject = function (f) { return new c(function (a, d) { d(f) }) }; c.race = function (f) { return new c(function (a, d) { for (var e = t(f), k = e.next(); !k.done; k = e.next())h(k.value).A(a, d) }) }; c.all = function (f) { var a = t(f), d = a.next(); return d.done ? h([]) : new c(function (e, k) { function p(C) { return function (D) { n[C] = D; r--; r == 0 && e(n) } } var n = [], r = 0; do n.push(void 0), r++, h(d.value).A(p(n.length - 1), k), d = a.next(); while (!d.done) }) }; return c
+            });
+            function K(b, c) { return Object.prototype.hasOwnProperty.call(b, c) } x("Object.is", function (b) { return b ? b : function (c, g) { return c === g ? c !== 0 || 1 / c === 1 / g : c !== c && g !== g } }); x("Array.prototype.includes", function (b) { return b ? b : function (c, g) { var h = this; h instanceof String && (h = String(h)); var l = h.length; g = g || 0; for (g < 0 && (g = Math.max(g + l, 0)); g < l; g++) { var m = h[g]; if (m === c || Object.is(m, c)) return !0 } return !1 } });
+            x("String.prototype.includes", function (b) { return b ? b : function (c, g) { if (this == null) throw new TypeError("The 'this' value for String.prototype.includes must not be null or undefined"); if (c instanceof RegExp) throw new TypeError("First argument to String.prototype.includes must not be a regular expression"); return this.indexOf(c, g || 0) !== -1 } });
+            x("WeakMap", function (b) {
+                function c(d) { this.g = (a += Math.random() + 1).toString(); if (d) { d = t(d); for (var e; !(e = d.next()).done;)e = e.value, this.set(e[0], e[1]) } } function g() { } function h(d) { var e = typeof d; return e === "object" && d !== null || e === "function" } function l(d) { if (!K(d, f)) { var e = new g; u(d, f, { value: e }) } } function m(d) { var e = Object[d]; e && (Object[d] = function (k) { if (k instanceof g) return k; Object.isExtensible(k) && l(k); return e(k) }) } if (function () {
+                    if (!b || !Object.seal) return !1; try {
+                        var d = Object.seal({}), e = Object.seal({}),
+                            k = new b([[d, 2], [e, 3]]); if (k.get(d) != 2 || k.get(e) != 3) return !1; k.delete(d); k.set(e, 4); return !k.has(d) && k.get(e) == 4
+                    } catch (p) { return !1 }
+                }()) return b; var f = "$jscomp_hidden_" + Math.random(); m("freeze"); m("preventExtensions"); m("seal"); var a = 0; c.prototype.set = function (d, e) { if (!h(d)) throw Error("Invalid WeakMap key"); l(d); if (!K(d, f)) throw Error("WeakMap key fail: " + d); d[f][this.g] = e; return this }; c.prototype.get = function (d) { return h(d) && K(d, f) ? d[f][this.g] : void 0 }; c.prototype.has = function (d) {
+                    return h(d) && K(d,
+                        f) && K(d[f], this.g)
+                }; c.prototype.delete = function (d) { return h(d) && K(d, f) && K(d[f], this.g) ? delete d[f][this.g] : !1 }; return c
+            });
+            x("Map", function (b) {
+                function c() { var a = {}; return a.m = a.next = a.head = a } function g(a, d) { var e = a[1]; return J(function () { if (e) { for (; e.head != a[1];)e = e.m; for (; e.next != e.head;)return e = e.next, { done: !1, value: d(e) }; e = null } return { done: !0, value: void 0 } }) } function h(a, d) {
+                    var e = d && typeof d; e == "object" || e == "function" ? m.has(d) ? e = m.get(d) : (e = "" + ++f, m.set(d, e)) : e = "p_" + d; var k = a[0][e]; if (k && K(a[0], e)) for (a = 0; a < k.length; a++) { var p = k[a]; if (d !== d && p.key !== p.key || d === p.key) return { id: e, list: k, index: a, entry: p } } return {
+                        id: e,
+                        list: k, index: -1, entry: void 0
+                    }
+                } function l(a) { this[0] = {}; this[1] = c(); this.size = 0; if (a) { a = t(a); for (var d; !(d = a.next()).done;)d = d.value, this.set(d[0], d[1]) } } if (function () {
+                    if (!b || typeof b != "function" || !b.prototype.entries || typeof Object.seal != "function") return !1; try {
+                        var a = Object.seal({ x: 4 }), d = new b(t([[a, "s"]])); if (d.get(a) != "s" || d.size != 1 || d.get({ x: 4 }) || d.set({ x: 4 }, "t") != d || d.size != 2) return !1; var e = d.entries(), k = e.next(); if (k.done || k.value[0] != a || k.value[1] != "s") return !1; k = e.next(); return k.done || k.value[0].x !=
+                            4 || k.value[1] != "t" || !e.next().done ? !1 : !0
+                    } catch (p) { return !1 }
+                }()) return b; var m = new WeakMap; l.prototype.set = function (a, d) { a = a === 0 ? 0 : a; var e = h(this, a); e.list || (e.list = this[0][e.id] = []); e.entry ? e.entry.value = d : (e.entry = { next: this[1], m: this[1].m, head: this[1], key: a, value: d }, e.list.push(e.entry), this[1].m.next = e.entry, this[1].m = e.entry, this.size++); return this }; l.prototype.delete = function (a) {
+                    a = h(this, a); return a.entry && a.list ? (a.list.splice(a.index, 1), a.list.length || delete this[0][a.id], a.entry.m.next = a.entry.next,
+                        a.entry.next.m = a.entry.m, a.entry.head = null, this.size--, !0) : !1
+                }; l.prototype.clear = function () { this[0] = {}; this[1] = this[1].m = c(); this.size = 0 }; l.prototype.has = function (a) { return !!h(this, a).entry }; l.prototype.get = function (a) { return (a = h(this, a).entry) && a.value }; l.prototype.entries = function () { return g(this, function (a) { return [a.key, a.value] }) }; l.prototype.keys = function () { return g(this, function (a) { return a.key }) }; l.prototype.values = function () { return g(this, function (a) { return a.value }) }; l.prototype.forEach =
+                    function (a, d) { for (var e = this.entries(), k; !(k = e.next()).done;)k = k.value, a.call(d, k[1], k[0], this) }; l.prototype[Symbol.iterator] = l.prototype.entries; var f = 0; return l
+            });
+            x("Set", function (b) {
+                function c(g) { this.g = new Map; if (g) { g = t(g); for (var h; !(h = g.next()).done;)this.add(h.value) } this.size = this.g.size } if (function () {
+                    if (!b || typeof b != "function" || !b.prototype.entries || typeof Object.seal != "function") return !1; try {
+                        var g = Object.seal({ x: 4 }), h = new b(t([g])); if (!h.has(g) || h.size != 1 || h.add(g) != h || h.size != 1 || h.add({ x: 4 }) != h || h.size != 2) return !1; var l = h.entries(), m = l.next(); if (m.done || m.value[0] != g || m.value[1] != g) return !1; m = l.next(); return m.done || m.value[0] == g || m.value[0].x != 4 ||
+                            m.value[1] != m.value[0] ? !1 : l.next().done
+                    } catch (f) { return !1 }
+                }()) return b; c.prototype.add = function (g) { g = g === 0 ? 0 : g; this.g.set(g, g); this.size = this.g.size; return this }; c.prototype.delete = function (g) { g = this.g.delete(g); this.size = this.g.size; return g }; c.prototype.clear = function () { this.g.clear(); this.size = 0 }; c.prototype.has = function (g) { return this.g.has(g) }; c.prototype.entries = function () { return this.g.entries() }; c.prototype.values = function () { return this.g.values() }; c.prototype.keys = c.prototype.values; c.prototype[Symbol.iterator] =
+                    c.prototype.values; c.prototype.forEach = function (g, h) { var l = this; this.g.forEach(function (m) { return g.call(h, m, m, l) }) }; return c
+            }); (function () {
+                function b() {
+                    return m ? Promise.resolve(m) : f ? f : f = fetch("https://www.gstatic.com/bard-maui/resources/material-design-icon-names.804824289.json").then(function (a) { if (!a.ok) throw Error("HTTP error! status: " + a.status + " fetching https://www.gstatic.com/bard-maui/resources/material-design-icon-names.804824289.json"); return a.json() }).then(function (a) {
+                        if (!Array.isArray(a)) throw new TypeError("Fetched icon names from https://www.gstatic.com/bard-maui/resources/material-design-icon-names.804824289.json is not an array.");
+                        return m = a
+                    }).catch(function (a) { console.error("IconChecker: Failed to load valid icon names from https://www.gstatic.com/bard-maui/resources/material-design-icon-names.804824289.json.", a); f = null; throw a; })
+                } function c(a) {
+                    var d, e, k, p; return I(new H(new B(function (n) {
+                        switch (n.h) {
+                            case 1: d = (a.textContent || "").trim(); if (!d || a.classList.contains("js-replaced-missing-icon") && d === "radio_button_unchecked") return n.return(); e = window.getComputedStyle(a); if (e.display === "none" || e.visibility === "hidden") return n.return();
+                                n.l = 2; var r = b(); n.h = 4; return { value: r }; case 4: k = n.u; n.h = 3; n.l = 0; break; case 2: return n.l = 0, n.i = null, console.warn('IconChecker: Skipping check for icon "' + d + '" as valid names could not be loaded.'), n.return(); case 3: (p = k.includes(d)) ? a.classList.contains("js-replaced-missing-icon") && a.classList.remove("js-replaced-missing-icon") : d === "radio_button_unchecked" && a.classList.contains("js-replaced-missing-icon") || (a.textContent = "radio_button_unchecked", a.classList.add("js-replaced-missing-icon")), n.h = 0
+                        }
+                    })))
+                }
+                function g(a) { a = a === void 0 ? document.body : a; a.querySelectorAll(l).forEach(function (d) { c(d) }) } function h() {
+                    b().catch(function () { }); document.fonts.ready.then(function () {
+                        requestAnimationFrame(function () {
+                            g(document.body); (new MutationObserver(function (a) {
+                                var d = new Set; a = t(a); for (var e = a.next(); !e.done; e = a.next())if (e = e.value, e.type === "childList") e.addedNodes.forEach(function (p) { p.nodeType === Node.ELEMENT_NODE && (p.matches(l) && d.add(p), p.querySelectorAll(l).forEach(function (n) { d.add(n) })) }); else if (e.type ===
+                                    "attributes" && e.attributeName === "class") { var k = e.target; e.target.nodeType === Node.ELEMENT_NODE && k.matches(l) && d.add(k) } else e.type === "characterData" && e.target.parentNode && (e = e.target.parentNode, e.nodeType === Node.ELEMENT_NODE && e.matches(l) && d.add(e)); d.size > 0 && setTimeout(function () { d.forEach(function (p) { c(p) }) }, 500)
+                            })).observe(document.body, { childList: !0, subtree: !0, attributes: !0, attributeFilter: ["class"], characterData: !0 })
+                        })
+                    }).catch(function (a) {
+                        console.error("IconChecker: Font loading error. Scanning icons anyway.",
+                            a); requestAnimationFrame(function () { g(document.body) })
+                    })
+                } var l = ["material-icons", "material-symbols-outlined", "material-symbols-rounded", "material-symbols-sharp"].map(function (a) { return "." + a }).join(","), m = null, f = null; document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function () { h() }) : h()
+            })();
+        }).call(this);
+
+
+    </script>
+
+
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RoboTest AI Suite - Sumerge Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Slide Transitions */
+        .slide-container {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* CSS-Only Visuals */
+        .bg-grid-pattern {
+            background-size: 50px 50px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        .animate-pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Edit Mode Styles */
+        .editable-active:hover {
+            outline: 2px dashed rgba(96, 165, 250, 0.5);
+            background: rgba(96, 165, 250, 0.1);
+            border-radius: 4px;
+            cursor: text;
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+    </style>
+    <style>
+        *,
+        ::before,
+        ::after {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        ::backdrop {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        /* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb
+        }
+
+        ::after,
+        ::before {
+            --tw-content: ''
+        }
+
+        :host,
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            margin: 0;
+            line-height: inherit
+        }
+
+        hr {
+            height: 0;
+            color: inherit;
+            border-top-width: 1px
+        }
+
+        abbr:where([title]) {
+            -webkit-text-decoration: underline dotted;
+            text-decoration: underline dotted
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: inherit;
+            font-weight: inherit
+        }
+
+        a {
+            color: inherit;
+            text-decoration: inherit
+        }
+
+        b,
+        strong {
+            font-weight: bolder
+        }
+
+        code,
+        kbd,
+        pre,
+        samp {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            font-size: 1em
+        }
+
+        small {
+            font-size: 80%
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        table {
+            text-indent: 0;
+            border-color: inherit;
+            border-collapse: collapse
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: inherit;
+            font-feature-settings: inherit;
+            font-variation-settings: inherit;
+            font-size: 100%;
+            font-weight: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0
+        }
+
+        button,
+        select {
+            text-transform: none
+        }
+
+        button,
+        input:where([type=button]),
+        input:where([type=reset]),
+        input:where([type=submit]) {
+            -webkit-appearance: button;
+            background-color: transparent;
+            background-image: none
+        }
+
+        :-moz-focusring {
+            outline: auto
+        }
+
+        :-moz-ui-invalid {
+            box-shadow: none
+        }
+
+        progress {
+            vertical-align: baseline
+        }
+
+        ::-webkit-inner-spin-button,
+        ::-webkit-outer-spin-button {
+            height: auto
+        }
+
+        [type=search] {
+            -webkit-appearance: textfield;
+            outline-offset: -2px
+        }
+
+        ::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+
+        ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            font: inherit
+        }
+
+        summary {
+            display: list-item
+        }
+
+        blockquote,
+        dd,
+        dl,
+        figure,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        hr,
+        p,
+        pre {
+            margin: 0
+        }
+
+        fieldset {
+            margin: 0;
+            padding: 0
+        }
+
+        legend {
+            padding: 0
+        }
+
+        menu,
+        ol,
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        dialog {
+            padding: 0
+        }
+
+        textarea {
+            resize: vertical
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            opacity: 1;
+            color: #9ca3af
+        }
+
+        [role=button],
+        button {
+            cursor: pointer
+        }
+
+        :disabled {
+            cursor: default
+        }
+
+        audio,
+        canvas,
+        embed,
+        iframe,
+        img,
+        object,
+        svg,
+        video {
+            display: block;
+            vertical-align: middle
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto
+        }
+
+        [hidden]:where(:not([hidden=until-found])) {
+            display: none
+        }
+
+        .pointer-events-none {
+            pointer-events: none
+        }
+
+        .pointer-events-auto {
+            pointer-events: auto
+        }
+
+        .fixed {
+            position: fixed
+        }
+
+        .absolute {
+            position: absolute
+        }
+
+        .relative {
+            position: relative
+        }
+
+        .inset-0 {
+            inset: 0px
+        }
+
+        .bottom-0 {
+            bottom: 0px
+        }
+
+        .bottom-8 {
+            bottom: 2rem
+        }
+
+        .left-0 {
+            left: 0px
+        }
+
+        .left-1\/2 {
+            left: 50%
+        }
+
+        .right-0 {
+            right: 0px
+        }
+
+        .top-0 {
+            top: 0px
+        }
+
+        .top-1\/2 {
+            top: 50%
+        }
+
+        .z-0 {
+            z-index: 0
+        }
+
+        .z-10 {
+            z-index: 10
+        }
+
+        .z-40 {
+            z-index: 40
+        }
+
+        .z-50 {
+            z-index: 50
+        }
+
+        .z-\[60\] {
+            z-index: 60
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .-mr-16 {
+            margin-right: -4rem
+        }
+
+        .-mt-16 {
+            margin-top: -4rem
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem
+        }
+
+        .mb-12 {
+            margin-bottom: 3rem
+        }
+
+        .mb-16 {
+            margin-bottom: 4rem
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem
+        }
+
+        .mt-12 {
+            margin-top: 3rem
+        }
+
+        .mt-8 {
+            margin-top: 2rem
+        }
+
+        .inline-block {
+            display: inline-block
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .inline-flex {
+            display: inline-flex
+        }
+
+        .grid {
+            display: grid
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .h-1 {
+            height: 0.25rem
+        }
+
+        .h-10 {
+            height: 2.5rem
+        }
+
+        .h-12 {
+            height: 3rem
+        }
+
+        .h-2 {
+            height: 0.5rem
+        }
+
+        .h-20 {
+            height: 5rem
+        }
+
+        .h-24 {
+            height: 6rem
+        }
+
+        .h-3 {
+            height: 0.75rem
+        }
+
+        .h-4 {
+            height: 1rem
+        }
+
+        .h-80 {
+            height: 20rem
+        }
+
+        .h-96 {
+            height: 24rem
+        }
+
+        .h-\[400px\] {
+            height: 400px
+        }
+
+        .h-full {
+            height: 100%
+        }
+
+        .h-screen {
+            height: 100vh
+        }
+
+        .w-10 {
+            width: 2.5rem
+        }
+
+        .w-12 {
+            width: 3rem
+        }
+
+        .w-16 {
+            width: 4rem
+        }
+
+        .w-2 {
+            width: 0.5rem
+        }
+
+        .w-20 {
+            width: 5rem
+        }
+
+        .w-24 {
+            width: 6rem
+        }
+
+        .w-3 {
+            width: 0.75rem
+        }
+
+        .w-80 {
+            width: 20rem
+        }
+
+        .w-96 {
+            width: 24rem
+        }
+
+        .w-full {
+            width: 100%
+        }
+
+        .w-px {
+            width: 1px
+        }
+
+        .w-screen {
+            width: 100vw
+        }
+
+        .max-w-2xl {
+            max-width: 42rem
+        }
+
+        .max-w-3xl {
+            max-width: 48rem
+        }
+
+        .max-w-4xl {
+            max-width: 56rem
+        }
+
+        .max-w-5xl {
+            max-width: 64rem
+        }
+
+        .max-w-7xl {
+            max-width: 80rem
+        }
+
+        .flex-1 {
+            flex: 1 1 0%
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0
+        }
+
+        .-translate-x-1\/2 {
+            --tw-translate-x: -50%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .-translate-x-full {
+            --tw-translate-x: -100%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .-translate-y-1\/2 {
+            --tw-translate-y: -50%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .translate-x-full {
+            --tw-translate-x: 100%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .transform {
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        @keyframes pulse {
+            50% {
+                opacity: .5
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr))
+        }
+
+        .flex-col {
+            flex-direction: column
+        }
+
+        .items-start {
+            align-items: flex-start
+        }
+
+        .items-end {
+            align-items: flex-end
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-center {
+            justify-content: center
+        }
+
+        .justify-between {
+            justify-content: space-between
+        }
+
+        .gap-16 {
+            gap: 4rem
+        }
+
+        .gap-2 {
+            gap: 0.5rem
+        }
+
+        .gap-3 {
+            gap: 0.75rem
+        }
+
+        .gap-4 {
+            gap: 1rem
+        }
+
+        .gap-6 {
+            gap: 1.5rem
+        }
+
+        .space-y-6> :not([hidden])~ :not([hidden]) {
+            --tw-space-y-reverse: 0;
+            margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+            margin-bottom: calc(1.5rem * var(--tw-space-y-reverse))
+        }
+
+        .overflow-hidden {
+            overflow: hidden
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto
+        }
+
+        .whitespace-pre-line {
+            white-space: pre-line
+        }
+
+        .rounded {
+            border-radius: 0.25rem
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem
+        }
+
+        .rounded-3xl {
+            border-radius: 1.5rem
+        }
+
+        .rounded-full {
+            border-radius: 9999px
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem
+        }
+
+        .border {
+            border-width: 1px
+        }
+
+        .border-b {
+            border-bottom-width: 1px
+        }
+
+        .border-l {
+            border-left-width: 1px
+        }
+
+        .border-t-4 {
+            border-top-width: 4px
+        }
+
+        .border-blue-400\/20 {
+            border-color: rgb(96 165 250 / 0.2)
+        }
+
+        .border-blue-500 {
+            --tw-border-opacity: 1;
+            border-color: rgb(59 130 246 / var(--tw-border-opacity, 1))
+        }
+
+        .border-blue-500\/20 {
+            border-color: rgb(59 130 246 / 0.2)
+        }
+
+        .border-blue-500\/30 {
+            border-color: rgb(59 130 246 / 0.3)
+        }
+
+        .border-blue-500\/50 {
+            border-color: rgb(59 130 246 / 0.5)
+        }
+
+        .border-green-400\/20 {
+            border-color: rgb(74 222 128 / 0.2)
+        }
+
+        .border-green-500 {
+            --tw-border-opacity: 1;
+            border-color: rgb(34 197 94 / var(--tw-border-opacity, 1))
+        }
+
+        .border-orange-500 {
+            --tw-border-opacity: 1;
+            border-color: rgb(249 115 22 / var(--tw-border-opacity, 1))
+        }
+
+        .border-purple-400\/20 {
+            border-color: rgb(192 132 252 / 0.2)
+        }
+
+        .border-purple-500 {
+            --tw-border-opacity: 1;
+            border-color: rgb(168 85 247 / var(--tw-border-opacity, 1))
+        }
+
+        .border-slate-700 {
+            --tw-border-opacity: 1;
+            border-color: rgb(51 65 85 / var(--tw-border-opacity, 1))
+        }
+
+        .border-transparent {
+            border-color: transparent
+        }
+
+        .bg-\[\#0D1117\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(13 17 23 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#161B22\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(22 27 34 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#27C93F\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(39 201 63 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#FF5F56\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 95 86 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#FFBD2E\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 189 46 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-blue-400\/10 {
+            background-color: rgb(96 165 250 / 0.1)
+        }
+
+        .bg-blue-500 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-blue-500\/10 {
+            background-color: rgb(59 130 246 / 0.1)
+        }
+
+        .bg-blue-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-blue-600\/10 {
+            background-color: rgb(37 99 235 / 0.1)
+        }
+
+        .bg-blue-600\/20 {
+            background-color: rgb(37 99 235 / 0.2)
+        }
+
+        .bg-emerald-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(5 150 105 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-green-400\/10 {
+            background-color: rgb(74 222 128 / 0.1)
+        }
+
+        .bg-green-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(22 163 74 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-purple-400\/10 {
+            background-color: rgb(192 132 252 / 0.1)
+        }
+
+        .bg-purple-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(147 51 234 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-slate-600 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(71 85 105 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-slate-800 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(30 41 59 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-slate-800\/50 {
+            background-color: rgb(30 41 59 / 0.5)
+        }
+
+        .bg-slate-800\/90 {
+            background-color: rgb(30 41 59 / 0.9)
+        }
+
+        .bg-slate-900 {
+            --tw-bg-opacity: 1;
+            background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-slate-900\/90 {
+            background-color: rgb(15 23 42 / 0.9)
+        }
+
+        .bg-gradient-to-b {
+            background-image: linear-gradient(to bottom, var(--tw-gradient-stops))
+        }
+
+        .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--tw-gradient-stops))
+        }
+
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops))
+        }
+
+        .from-blue-500\/20 {
+            --tw-gradient-from: rgb(59 130 246 / 0.2) var(--tw-gradient-from-position);
+            --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+        }
+
+        .from-blue-600 {
+            --tw-gradient-from: #2563eb var(--tw-gradient-from-position);
+            --tw-gradient-to: rgb(37 99 235 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+        }
+
+        .from-transparent {
+            --tw-gradient-from: transparent var(--tw-gradient-from-position);
+            --tw-gradient-to: rgb(0 0 0 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+        }
+
+        .from-white {
+            --tw-gradient-from: #fff var(--tw-gradient-from-position);
+            --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+        }
+
+        .via-blue-500 {
+            --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), #3b82f6 var(--tw-gradient-via-position), var(--tw-gradient-to)
+        }
+
+        .via-purple-500\/20 {
+            --tw-gradient-to: rgb(168 85 247 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), rgb(168 85 247 / 0.2) var(--tw-gradient-via-position), var(--tw-gradient-to)
+        }
+
+        .to-green-500\/20 {
+            --tw-gradient-to: rgb(34 197 94 / 0.2) var(--tw-gradient-to-position)
+        }
+
+        .to-purple-500\/20 {
+            --tw-gradient-to: rgb(168 85 247 / 0.2) var(--tw-gradient-to-position)
+        }
+
+        .to-purple-600 {
+            --tw-gradient-to: #9333ea var(--tw-gradient-to-position)
+        }
+
+        .to-slate-600 {
+            --tw-gradient-to: #475569 var(--tw-gradient-to-position)
+        }
+
+        .to-transparent {
+            --tw-gradient-to: transparent var(--tw-gradient-to-position)
+        }
+
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text
+        }
+
+        .p-12 {
+            padding: 3rem
+        }
+
+        .p-16 {
+            padding: 4rem
+        }
+
+        .p-2 {
+            padding: 0.5rem
+        }
+
+        .p-3 {
+            padding: 0.75rem
+        }
+
+        .p-32 {
+            padding: 8rem
+        }
+
+        .p-4 {
+            padding: 1rem
+        }
+
+        .p-6 {
+            padding: 1.5rem
+        }
+
+        .p-8 {
+            padding: 2rem
+        }
+
+        .px-10 {
+            padding-left: 2.5rem;
+            padding-right: 2.5rem
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem
+        }
+
+        .px-8 {
+            padding-left: 2rem;
+            padding-right: 2rem
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem
+        }
+
+        .py-5 {
+            padding-top: 1.25rem;
+            padding-bottom: 1.25rem
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .font-mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 2rem
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem
+        }
+
+        .text-4xl {
+            font-size: 2.25rem;
+            line-height: 2.5rem
+        }
+
+        .text-5xl {
+            font-size: 3rem;
+            line-height: 1
+        }
+
+        .text-6xl {
+            font-size: 3.75rem;
+            line-height: 1
+        }
+
+        .text-7xl {
+            font-size: 4.5rem;
+            line-height: 1
+        }
+
+        .text-\[10rem\] {
+            font-size: 10rem
+        }
+
+        .text-base {
+            font-size: 1rem;
+            line-height: 1.5rem
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+            line-height: 1rem
+        }
+
+        .font-black {
+            font-weight: 900
+        }
+
+        .font-bold {
+            font-weight: 700
+        }
+
+        .font-extrabold {
+            font-weight: 800
+        }
+
+        .font-light {
+            font-weight: 300
+        }
+
+        .font-semibold {
+            font-weight: 600
+        }
+
+        .uppercase {
+            text-transform: uppercase
+        }
+
+        .leading-none {
+            line-height: 1
+        }
+
+        .leading-relaxed {
+            line-height: 1.625
+        }
+
+        .leading-tight {
+            line-height: 1.25
+        }
+
+        .tracking-tight {
+            letter-spacing: -0.025em
+        }
+
+        .tracking-tighter {
+            letter-spacing: -0.05em
+        }
+
+        .tracking-wide {
+            letter-spacing: 0.025em
+        }
+
+        .tracking-wider {
+            letter-spacing: 0.05em
+        }
+
+        .tracking-widest {
+            letter-spacing: 0.1em
+        }
+
+        .text-blue-200 {
+            --tw-text-opacity: 1;
+            color: rgb(191 219 254 / var(--tw-text-opacity, 1))
+        }
+
+        .text-blue-400 {
+            --tw-text-opacity: 1;
+            color: rgb(96 165 250 / var(--tw-text-opacity, 1))
+        }
+
+        .text-green-400 {
+            --tw-text-opacity: 1;
+            color: rgb(74 222 128 / var(--tw-text-opacity, 1))
+        }
+
+        .text-orange-400 {
+            --tw-text-opacity: 1;
+            color: rgb(251 146 60 / var(--tw-text-opacity, 1))
+        }
+
+        .text-purple-400 {
+            --tw-text-opacity: 1;
+            color: rgb(192 132 252 / var(--tw-text-opacity, 1))
+        }
+
+        .text-slate-200 {
+            --tw-text-opacity: 1;
+            color: rgb(226 232 240 / var(--tw-text-opacity, 1))
+        }
+
+        .text-slate-300 {
+            --tw-text-opacity: 1;
+            color: rgb(203 213 225 / var(--tw-text-opacity, 1))
+        }
+
+        .text-slate-400 {
+            --tw-text-opacity: 1;
+            color: rgb(148 163 184 / var(--tw-text-opacity, 1))
+        }
+
+        .text-slate-500 {
+            --tw-text-opacity: 1;
+            color: rgb(100 116 139 / var(--tw-text-opacity, 1))
+        }
+
+        .text-transparent {
+            color: transparent
+        }
+
+        .text-white {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .text-yellow-500 {
+            --tw-text-opacity: 1;
+            color: rgb(234 179 8 / var(--tw-text-opacity, 1))
+        }
+
+        .opacity-0 {
+            opacity: 0
+        }
+
+        .opacity-20 {
+            opacity: 0.2
+        }
+
+        .opacity-30 {
+            opacity: 0.3
+        }
+
+        .mix-blend-screen {
+            mix-blend-mode: screen
+        }
+
+        .shadow-2xl {
+            --tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .shadow-lg {
+            --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .shadow-xl {
+            --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .shadow-blue-500\/20 {
+            --tw-shadow-color: rgb(59 130 246 / 0.2);
+            --tw-shadow: var(--tw-shadow-colored)
+        }
+
+        .shadow-blue-600\/20 {
+            --tw-shadow-color: rgb(37 99 235 / 0.2);
+            --tw-shadow: var(--tw-shadow-colored)
+        }
+
+        .shadow-green-600\/20 {
+            --tw-shadow-color: rgb(22 163 74 / 0.2);
+            --tw-shadow: var(--tw-shadow-colored)
+        }
+
+        .shadow-purple-600\/20 {
+            --tw-shadow-color: rgb(147 51 234 / 0.2);
+            --tw-shadow: var(--tw-shadow-colored)
+        }
+
+        .outline-none {
+            outline: 2px solid transparent;
+            outline-offset: 2px
+        }
+
+        .blur-3xl {
+            --tw-blur: blur(64px);
+            filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
+        }
+
+        .backdrop-blur-2xl {
+            --tw-backdrop-blur: blur(40px);
+            -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+            backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
+        }
+
+        .backdrop-blur-xl {
+            --tw-backdrop-blur: blur(24px);
+            -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+            backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .transition-colors {
+            transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .transition-opacity {
+            transition-property: opacity;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .transition-transform {
+            transition-property: transform;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .duration-1000 {
+            transition-duration: 1000ms
+        }
+
+        .duration-300 {
+            transition-duration: 300ms
+        }
+
+        .duration-500 {
+            transition-duration: 500ms
+        }
+
+        .duration-700 {
+            transition-duration: 700ms
+        }
+
+        .ease-in-out {
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
+        }
+
+        .selection\:bg-blue-500 *::selection {
+            --tw-bg-opacity: 1;
+            background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1))
+        }
+
+        .selection\:text-white *::selection {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .selection\:bg-blue-500::selection {
+            --tw-bg-opacity: 1;
+            background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1))
+        }
+
+        .selection\:text-white::selection {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .hover\:-translate-y-2:hover {
+            --tw-translate-y: -0.5rem;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .hover\:border-blue-400:hover {
+            --tw-border-opacity: 1;
+            border-color: rgb(96 165 250 / var(--tw-border-opacity, 1))
+        }
+
+        .hover\:border-blue-500\/50:hover {
+            border-color: rgb(59 130 246 / 0.5)
+        }
+
+        .hover\:bg-blue-500:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-slate-700:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-white\/10:hover {
+            background-color: rgb(255 255 255 / 0.1)
+        }
+
+        .hover\:bg-white\/5:hover {
+            background-color: rgb(255 255 255 / 0.05)
+        }
+
+        .hover\:from-blue-500:hover {
+            --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
+            --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+        }
+
+        .hover\:to-purple-500:hover {
+            --tw-gradient-to: #a855f7 var(--tw-gradient-to-position)
+        }
+
+        .hover\:text-blue-400:hover {
+            --tw-text-opacity: 1;
+            color: rgb(96 165 250 / var(--tw-text-opacity, 1))
+        }
+
+        .hover\:text-white:hover {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .hover\:shadow-blue-500\/50:hover {
+            --tw-shadow-color: rgb(59 130 246 / 0.5);
+            --tw-shadow: var(--tw-shadow-colored)
+        }
+
+        .focus\:text-white:focus {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .disabled\:opacity-30:disabled {
+            opacity: 0.3
+        }
+
+        .group:hover .group-hover\:translate-x-full {
+            --tw-translate-x: 100%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .group:hover .group-hover\:scale-110 {
+            --tw-scale-x: 1.1;
+            --tw-scale-y: 1.1;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .group:hover .group-hover\:text-blue-400 {
+            --tw-text-opacity: 1;
+            color: rgb(96 165 250 / var(--tw-text-opacity, 1))
+        }
+
+        .group:hover .group-hover\:text-green-400 {
+            --tw-text-opacity: 1;
+            color: rgb(74 222 128 / var(--tw-text-opacity, 1))
+        }
+
+        .group:hover .group-hover\:opacity-100 {
+            opacity: 1
+        }
+
+        @media (min-width: 768px) {
+            .md\:block {
+                display: block
+            }
+
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+
+            .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr))
+            }
+
+            .md\:p-24 {
+                padding: 6rem
+            }
+
+            .md\:text-2xl {
+                font-size: 1.5rem;
+                line-height: 2rem
+            }
+
+            .md\:text-5xl {
+                font-size: 3rem;
+                line-height: 1
+            }
+
+            .md\:text-6xl {
+                font-size: 3.75rem;
+                line-height: 1
+            }
+
+            .md\:text-8xl {
+                font-size: 6rem;
+                line-height: 1
+            }
+
+            .md\:text-sm {
+                font-size: 0.875rem;
+                line-height: 1.25rem
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr))
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen relative selection:bg-blue-500 selection:text-white">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-slate-900">
+        <div class="absolute inset-0 bg-grid-pattern opacity-30"></div>
+        <div class="blob bg-blue-600 w-96 h-96 rounded-full top-0 left-0 mix-blend-screen"></div>
+        <div class="blob bg-purple-600 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-screen"
+            style="animation-delay: 2s"></div>
+        <div class="blob bg-emerald-600 w-80 h-80 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mix-blend-screen opacity-20"
+            style="animation-delay: 4s"></div>
+    </div>
+    <!-- Toolbar -->
+    <div class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-start pointer-events-none">
+        <div class="glass px-4 py-2 rounded-full pointer-events-auto flex items-center gap-4 shadow-xl">
+            <div class="bg-white p-1 rounded-md flex items-center justify-center">
+                <img src="Sumergelogo.png" class="h-6 w-auto" alt="Sumerge Logo">
+            </div>
+            <div class="h-4 w-px bg-slate-600"></div>
+            <span class="font-bold tracking-wider text-xs md:text-sm flex items-center gap-2 font-mono text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                ROBOTEST AI PRESENTATION
+            </span>
+            <div class="h-4 w-px bg-slate-600 hidden md:block"></div>
+            <span class="text-[10px] md:text-xs text-slate-400 font-mono tracking-wide hidden md:block">
+                Presented by <span class="text-blue-400 font-semibold">Abdelrahman Kandil</span>
+            </span>
+        </div>
+        <div class="glass p-2 rounded-full pointer-events-auto flex items-center gap-2 shadow-xl" id="toolbar">
+            <button
+                class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors relative group"
+                id="edit-btn" onclick="toggleEditMode()">
+                <span class="material-symbols-outlined text-slate-300 group-hover:text-blue-400">edit</span>
+            </button>
+            <button
+                class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors relative group"
+                onclick="downloadPresentation()">
+                <span class="material-symbols-outlined text-slate-300 group-hover:text-green-400">download</span>
+            </button>
+        </div>
+    </div>
+    <!-- Main Slide Container -->
+    <div class="relative z-10 w-full h-full flex transition-transform duration-700 ease-in-out" id="slides-wrapper"
+        style="transform: translateX(0%);">
+        <!-- Slide 0: Title -->
+        <div class="w-full h-full flex-shrink-0 flex items-center justify-center p-8 relative" id="slide-0">
+            <div class="text-center max-w-5xl mx-auto">
+                <div
+                    class="mb-8 inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-slate-800 border border-slate-700 shadow-2xl shadow-blue-500/20 relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <span class="material-symbols-outlined text-6xl text-blue-400 relative z-10">smart_toy</span>
+                </div>
+                <h1 class="editable text-6xl md:text-8xl font-extrabold tracking-tight mb-4 leading-tight">
+                    RoboTest <span class="text-gradient">AI Suite</span>
+                </h1>
+                <p class="editable text-xl md:text-2xl text-slate-300 font-light mb-8 max-w-3xl mx-auto">
+                    Intelligent Testing Innovation Powered by <br>
+                    <span class="text-blue-400 font-semibold">Gemini</span>, <span
+                        class="text-purple-400 font-semibold">Claude</span>, <span
+                        class="text-green-400 font-semibold">OpenAI</span> &amp; <span
+                        class="text-slate-200 font-semibold">GitHub Models</span>
+                </p>
+                <div class="glass inline-flex items-center gap-4 px-8 py-4 rounded-full mb-12 border-blue-500/30">
+                    <span class="text-sm font-mono text-slate-400 uppercase tracking-widest">Developed By</span>
+                    <span class="h-4 w-px bg-slate-600"></span>
+                    <span class="text-lg font-bold text-white tracking-wide">Abdelrahman Kandil</span>
+                </div>
+                <div class="flex justify-center">
+                    <button
+                        class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-blue-500/50 flex items-center gap-2"
+                        onclick="nextSlide()">
+                        Explore Platform <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 1: Platform Overview -->
+        <div class="w-full h-full flex-shrink-0 flex items-center p-12 md:p-24 relative" id="slide-1">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div
+                        class="editable inline-block px-4 py-1 mb-6 text-sm font-bold tracking-wider text-blue-400 uppercase bg-blue-400/10 rounded-full border border-blue-400/20">
+                        Platform Overview
+                    </div>
+                    <h2 class="editable text-5xl font-bold mb-8 leading-tight">
+                        The Intelligent <br>QA Platform
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-slate-800 rounded-lg text-blue-400">
+                                <span class="material-symbols-outlined">layers</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-1">Streamlit Architecture</h3>
+                                <p class="text-slate-400 text-sm">Built on Streamlit for a highly intuitive, accessible,
+                                    and fast interface.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-slate-800 rounded-lg text-purple-400">
+                                <span class="material-symbols-outlined">psychology</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-1">Multi-LLM Intelligence</h3>
+                                <p class="text-slate-400 text-sm">Leverages the best models from Google, Anthropic, and
+                                    OpenAI.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-slate-800 rounded-lg text-green-400">
+                                <span class="material-symbols-outlined">speed</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-1">Efficiency Boost</h3>
+                                <p class="text-slate-400 text-sm">Significantly accelerates testing workflows from
+                                    generation to execution.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Big Stat -->
+                <div class="relative">
+                    <div
+                        class="glass p-12 rounded-3xl text-center relative overflow-hidden group hover:border-blue-500/50 transition-colors duration-500">
+                        <div class="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16">
+                        </div>
+                        <h3 class="text-2xl font-mono text-slate-400 mb-4">Reduces Manual Effort By</h3>
+                        <div
+                            class="text-[10rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-600 leading-none tracking-tighter mb-4">
+                            75%
+                        </div>
+                        <p class="text-blue-400 font-bold uppercase tracking-widest text-sm">Proven Efficiency</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2: AI Powerhouse -->
+        <div class="w-full h-full flex-shrink-0 flex flex-col justify-center p-12 md:p-24 relative" id="slide-2">
+            <div class="text-center mb-16">
+                <h2 class="editable text-4xl md:text-5xl font-bold mb-4">AI Provider Support</h2>
+                <p class="editable text-slate-400 text-lg">Integrated with the world's most advanced models</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+                <!-- Gemini -->
+                <div
+                    class="glass-card p-8 rounded-2xl border-t-4 border-blue-500 hover:-translate-y-2 transition-transform duration-300">
+                    <span
+                        class="material-symbols-outlined text-4xl text-blue-400 mb-4 js-replaced-missing-icon">radio_button_unchecked</span>
+                    <h3 class="text-xl font-bold mb-2">Google Gemini</h3>
+                    <p class="text-sm text-slate-400">Advanced AI capabilities for complex logic parsing.</p>
+                </div>
+                <!-- Claude -->
+                <div
+                    class="glass-card p-8 rounded-2xl border-t-4 border-orange-500 hover:-translate-y-2 transition-transform duration-300">
+                    <span
+                        class="material-symbols-outlined text-4xl text-orange-400 mb-4 js-replaced-missing-icon">radio_button_unchecked</span>
+                    <h3 class="text-xl font-bold mb-2">Claude AI</h3>
+                    <p class="text-sm text-slate-400">Anthropic's powerful model for nuanced context.</p>
+                </div>
+                <!-- OpenAI -->
+                <div
+                    class="glass-card p-8 rounded-2xl border-t-4 border-green-500 hover:-translate-y-2 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-4xl text-green-400 mb-4">smart_toy</span>
+                    <h3 class="text-xl font-bold mb-2">OpenAI GPT</h3>
+                    <p class="text-sm text-slate-400">Industry standard GPT-powered automation.</p>
+                </div>
+                <!-- GitHub -->
+                <div
+                    class="glass-card p-8 rounded-2xl border-t-4 border-purple-500 hover:-translate-y-2 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-4xl text-purple-400 mb-4">code_blocks</span>
+                    <h3 class="text-xl font-bold mb-2">GitHub Models</h3>
+                    <p class="text-sm text-slate-400">Seamless Copilot integration for code generation.</p>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <div
+                    class="inline-flex items-center gap-3 bg-blue-600/20 border border-blue-500/50 px-6 py-3 rounded-full">
+                    <span
+                        class="material-symbols-outlined text-blue-400 js-replaced-missing-icon">radio_button_unchecked</span>
+                    <span class="text-blue-200 font-mono text-sm">
+                        <strong>Auto Mode (Recommended):</strong> Automatically selects the best available provider.
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3: How It Works -->
+        <div class="w-full h-full flex-shrink-0 flex items-center p-12 relative" id="slide-3">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="text-center mb-16">
+                    <h2 class="editable text-4xl font-bold mb-4">How It Works</h2>
+                    <p class="editable text-slate-400">From concept to execution in 3 powerful steps</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                    <!-- Connector Lines -->
+                    <div
+                        class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-green-500/20 -translate-y-1/2 z-0">
+                    </div>
+                    <!-- Step 1 -->
+                    <div class="glass p-8 rounded-2xl relative z-10 bg-slate-900/90 h-full flex flex-col">
+                        <div
+                            class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mb-6 shadow-lg shadow-blue-600/20">
+                            1</div>
+                        <h3 class="text-2xl font-bold mb-2 text-white">Generate 🤖</h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-1">
+                            Input your requirements in <strong class="text-white">English</strong> or <strong
+                                class="text-white">Arabic</strong>. The AI instantly creates detailed test scenarios
+                            tailored to your business logic.
+                        </p>
+                        <div
+                            class="text-xs font-mono text-blue-400 bg-blue-400/10 p-3 rounded border border-blue-400/20 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">translate</span>
+                            Input: English / Arabic
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="glass p-8 rounded-2xl relative z-10 bg-slate-900/90 h-full flex flex-col">
+                        <div
+                            class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mb-6 shadow-lg shadow-purple-600/20">
+                            2</div>
+                        <h3 class="text-2xl font-bold mb-2 text-white">Automate ⚡</h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-1">
+                            Convert scenarios into production-ready scripts. We support <strong
+                                class="text-white">Selenium</strong> for Web UI and <strong class="text-white">Rest
+                                Assured</strong> for API testing.
+                        </p>
+                        <div
+                            class="text-xs font-mono text-purple-400 bg-purple-400/10 p-3 rounded border border-purple-400/20 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">code</span>
+                            Output: Selenium &amp; Rest Assured
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="glass p-8 rounded-2xl relative z-10 bg-slate-900/90 h-full flex flex-col">
+                        <div
+                            class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mb-6 shadow-lg shadow-green-600/20">
+                            3</div>
+                        <h3 class="text-2xl font-bold mb-2 text-white">Execute &amp; Sync 🎯</h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-1">
+                            Download your automated scripts and <strong class="text-white">CSV test cases</strong>.
+                            Automatically sync everything to your <strong class="text-white">Google Drive</strong> for
+                            safe keeping.
+                        </p>
+                        <div
+                            class="text-xs font-mono text-green-400 bg-green-400/10 p-3 rounded border border-green-400/20 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">cloud_upload</span>
+                            Google Drive Integration
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 4: Platform Demo -->
+        <div class="w-full h-full flex-shrink-0 flex flex-col items-center justify-center p-8 relative" id="slide-4">
+            <div class="max-w-5xl w-full">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white">Platform Demo</h2>
+                        <p class="text-slate-400">Simulating Step 2: Code Automation</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Mode: Auto</span>
+                        <span class="px-3 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Lang:
+                            English/Arabic</span>
+                    </div>
+                </div>
+                <!-- Terminal Window -->
+                <div
+                    class="bg-[#0D1117] rounded-xl border border-slate-700 shadow-2xl overflow-hidden font-mono text-sm relative">
+                    <!-- Window Title Bar -->
+                    <div class="bg-[#161B22] px-4 py-3 flex items-center gap-4 border-b border-slate-700">
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-[#FF5F56]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#FFBD2E]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#27C93F]"></div>
+                        </div>
+                        <div class="text-slate-400 text-xs flex-1 text-center">robotest-cli — zsh — 80x24</div>
+                    </div>
+                    <!-- Terminal Content -->
+                    <div class="p-6 h-[400px] overflow-y-auto" id="terminal-content">
+                        <div class="text-slate-400 mb-4">Welcome to RoboTest AI Suite CLI v2.0.0</div>
+                        <div class="mb-4">
+                            <span class="text-green-400">➜</span> <span class="text-blue-400">~</span> <span
+                                class="text-slate-200">generate-automation --input "Login Flow (Arabic)" --type
+                                "all"</span>
+                        </div>
+                        <div id="simulation-output">
+                            <button
+                                class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-xs font-bold transition-colors animate-pulse"
+                                onclick="runSimulation()">
+                                ▶ RUN GENERATION
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 5: NEW Discovery Slide -->
+        <div class="w-full h-full flex-shrink-0 flex items-center justify-center p-12 relative" id="slide-5">
+            <div class="text-center max-w-4xl mx-auto">
+                <div
+                    class="glass p-16 rounded-3xl border border-blue-500/20 bg-slate-800/50 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+                    <!-- Glow Effects -->
+                    <div
+                        class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                    </div>
+                    <div
+                        class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                    </div>
+                    <span
+                        class="material-symbols-outlined text-7xl text-blue-400 mb-8 animate-float">rocket_launch</span>
+                    <h2 class="editable text-5xl md:text-6xl font-bold mb-6 text-white leading-tight">
+                        Let's Discover <br><span class="text-gradient">The Website</span>
+                    </h2>
+                    <p class="editable text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
+                        Experience the future of automated testing firsthand. Access the live platform below.
+                    </p>
+                    <a class="inline-flex items-center gap-4 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full font-bold text-xl transition-all shadow-xl hover:shadow-blue-500/50 hover:-translate-y-2 animate-pulse-ring"
+                        href="https://robotest-ai-suite.streamlit.app/" target="_blank">
+                        <span>Launch Application</span>
+                        <span class="material-symbols-outlined">open_in_new</span>
+                    </a>
+                    <div class="mt-8">
+                        <a class="text-slate-500 hover:text-blue-400 font-mono text-sm transition-colors border-b border-transparent hover:border-blue-400"
+                            href="https://robotest-ai-suite.streamlit.app/" target="_blank">
+                            https://robotest-ai-suite.streamlit.app/
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 6: Closing -->
+        <div class="w-full h-full flex-shrink-0 flex items-center justify-center p-12 relative" id="slide-6">
+            <div class="text-center">
+                <div class="mb-12">
+                    <div
+                        class="w-20 h-20 mx-auto bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700 mb-6">
+                        <span
+                            class="material-symbols-outlined text-4xl text-slate-200 js-replaced-missing-icon">radio_button_unchecked</span>
+                    </div>
+                    <h2 class="text-5xl font-bold mb-4">Any Questions?</h2>
+                    <p class="text-xl text-slate-400">We're here to help you transform your QA process.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <a class="group glass p-6 rounded-xl hover:bg-white/5 transition-all"
+                        href="mailto:akandil@sumerge.com">
+                        <span
+                            class="material-symbols-outlined text-3xl text-blue-400 mb-3 group-hover:scale-110 transition-transform">mail</span>
+                        <h3 class="font-bold text-white mb-1">Email Support</h3>
+                        <p class="text-slate-400 text-sm">akandil@sumerge.com</p>
+                    </a>
+                    <a class="group glass p-6 rounded-xl hover:bg-white/5 transition-all"
+                        href="https://robotest-ai-suite.streamlit.app/" target="_blank">
+                        <span
+                            class="material-symbols-outlined text-3xl text-purple-400 mb-3 group-hover:scale-110 transition-transform">language</span>
+                        <h3 class="font-bold text-white mb-1">Visit Website</h3>
+                        <p class="text-slate-400 text-sm">robotest-ai-suite.streamlit.app</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Navigation Controls -->
+    <div class="fixed bottom-8 left-0 w-full flex justify-between px-8 z-40 pointer-events-none">
+        <div class="pointer-events-auto">
+            <button
+                class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-all shadow-lg border border-slate-700"
+                onclick="toggleNotes()" title="Speaker Notes">
+                <span class="material-symbols-outlined text-xl">sticky_note_2</span>
+            </button>
+        </div>
+        <div
+            class="flex items-center gap-6 pointer-events-auto bg-slate-800/90 backdrop-blur-xl px-6 py-3 rounded-full border border-slate-700 shadow-2xl">
+            <button
+                class="w-10 h-10 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-colors disabled:opacity-30"
+                id="btn-prev" onclick="prevSlide()" disabled="">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <span class="text-sm font-mono text-slate-400 w-16 text-center tracking-wider" id="slide-counter">1 /
+                7</span>
+            <button
+                class="w-10 h-10 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-colors disabled:opacity-30"
+                id="btn-next" onclick="nextSlide()">
+                <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+        </div>
+        <div class="pointer-events-auto">
+            <button
+                class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-all shadow-lg border border-slate-700"
+                onclick="toggleFullScreen()" title="Fullscreen">
+                <span class="material-symbols-outlined text-xl">fullscreen</span>
+            </button>
+        </div>
+    </div>
+    <!-- Speaker Notes Sidebar -->
+    <div class="fixed top-0 right-0 h-full w-96 bg-slate-900 border-l border-slate-700 transform translate-x-full transition-transform duration-300 z-[60] p-8 shadow-2xl flex flex-col"
+        id="notes-panel">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-bold text-xl text-slate-200 flex items-center gap-2">
+                <span class="material-symbols-outlined text-yellow-500">lightbulb</span>
+                Speaker Notes
+            </h3>
+            <button class="text-slate-400 hover:text-white transition-colors" onclick="toggleNotes()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="editable flex-1 text-slate-300 text-base leading-relaxed whitespace-pre-line outline-none focus:text-white"
+            id="notes-content">Intro:<br>- Welcome to the RoboTest AI Suite presentation.<br>- Proudly developed by
+            Abdelrahman Kandil at Sumerge.<br>- A powerful tool that leverages Gemini, Claude, OpenAI, and GitHub
+            Models.</div>
+    </div>
+    <script>
+        // State
+        let currentSlide = 0;
+        const totalSlides = 7; // Updated to 7
+        let isEditMode = false;
+
+        // Speaker Notes (Added note for new slide)
+        const speakerNotes = [
+            "Intro:\n- Welcome to the RoboTest AI Suite presentation.\n- Proudly developed by Abdelrahman Kandil at Sumerge.\n- A powerful tool that leverages Gemini, Claude, OpenAI, and GitHub Models.",
+            "Overview & Efficiency:\n- Key Highlight: RoboTest reduces manual testing effort by 75%.\n- It uses a Streamlit architecture for speed and accessibility.\n- It's a comprehensive platform for the entire QA lifecycle.",
+            "AI Providers:\n- We integrate the best models in the world.\n- Auto Mode selects the best provider for you.\n- This ensures accuracy in both logic generation and code creation.",
+            "How It Works (Process):\n- Step 1: Input requirements in English OR Arabic.\n- Step 2: We automatically generate Selenium (Web) and Rest Assured (API) scripts.\n- Step 3: Get your CSV test cases and automatically sync everything to Google Drive.",
+            "Live Simulation:\n- Watch the CLI generate code from a mixed-language input.\n- See the Java output for both Selenium and API testing.\n- (Click 'Run Generation' to demonstrate).",
+            "Discovery:\n- Now, let's stop talking and start doing.\n- I invite everyone to open the link on the screen.\n- Let's discover the RoboTest AI Suite live.",
+            "Closing:\n- Thank you for your time.\n- Feel free to ask questions.\n- Contact me directly at akandil@sumerge.com."
+        ];
+
+        let currentNotes = [...speakerNotes];
+
+        // Navigation Logic
+        function updateSlide() {
+            const wrapper = document.getElementById('slides-wrapper');
+            const counter = document.getElementById('slide-counter');
+            const notesContent = document.getElementById('notes-content');
+
+            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            counter.innerText = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('btn-prev').disabled = currentSlide === 0;
+            document.getElementById('btn-next').disabled = currentSlide === totalSlides - 1;
+            notesContent.innerText = currentNotes[currentSlide];
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Toggle Notes Panel
+        function toggleNotes() {
+            document.getElementById('notes-panel').classList.toggle('translate-x-full');
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editableElements = document.querySelectorAll('.editable');
+            const editBtn = document.getElementById('edit-btn');
+
+            if (isEditMode) {
+                editBtn.classList.add('bg-blue-600', 'text-white');
+                editableElements.forEach(el => {
+                    el.contentEditable = "true";
+                    el.classList.add('editable-active');
+                });
+            } else {
+                editBtn.classList.remove('bg-blue-600', 'text-white');
+                editableElements.forEach(el => {
+                    el.contentEditable = "false";
+                    el.classList.remove('editable-active');
+                });
+            }
+        }
+
+        // Download Presentation
+        function downloadPresentation() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'RoboTest_Sumerge_Presentation.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Fullscreen
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // Simulation Logic
+        async function runSimulation() {
+            const container = document.getElementById('simulation-output');
+            container.innerHTML = ''; // Clear button
+
+            const log = (text, color = 'text-slate-300', delay = 0) => {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        const div = document.createElement('div');
+                        div.className = `mb-1 ${color}`;
+                        div.innerHTML = text;
+                        container.appendChild(div);
+                        // Scroll to bottom
+                        const terminalWindow = document.getElementById('terminal-content');
+                        terminalWindow.scrollTop = terminalWindow.scrollHeight;
+                        resolve();
+                    }, delay);
+                });
+            };
+
+            await log("> Initializing RoboTest Engine...", "text-slate-400", 200);
+            await log("> Detecting Input Language: <span class='text-blue-400'>Arabic / English Mix</span>", "text-slate-400", 600);
+            await log("> Generating Test Scenarios (CSV)...", "text-purple-400", 800);
+            await log("> Generating Automation Scripts (Selenium + Rest Assured)...", "text-purple-400", 1200);
+
+            const outputCode = `
+    <div class='mt-4 bg-slate-800 p-3 rounded border border-slate-600 text-xs font-mono text-slate-300'>
+        <div class='text-slate-500 mb-2'>// Generated: LoginTest.java (Selenium)</div>
+        <span class='text-yellow-400'>public void</span> testLogin() {<br/>
+        &nbsp;&nbsp;driver.get(<span class='text-green-400'>"https://app.sumerge.com"</span>);<br/>
+        &nbsp;&nbsp;driver.findElement(By.id(<span class='text-green-400'>"user"</span>)).sendKeys(<span class='text-green-400'>"abdelrahman"</span>);<br/>
+        }<br/><br/>
+        <div class='text-slate-500 mb-2'>// Generated: ApiTest.java (Rest Assured)</div>
+        <span class='text-yellow-400'>public void</span> testApiStatus() {<br/>
+        &nbsp;&nbsp;given().baseUri(<span class='text-green-400'>"https://api.sumerge.com"</span>)<br/>
+        &nbsp;&nbsp;.when().get(<span class='text-green-400'>"/status"</span>)<br/>
+        &nbsp;&nbsp;.then().statusCode(200);<br/>
+        }
+    </div>`;
+
+            await log(outputCode, "text-slate-300", 500);
+            await log("> Syncing test_cases.csv to Google Drive...", "text-blue-400", 1500);
+            await log("> <strong>✔ Success!</strong> All artifacts saved to Drive.", "text-green-400 font-bold mt-2", 500);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (!isEditMode) {
+                if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            }
+        });
+
+        // Init
+        updateSlide();
+    </script>
+
+</body>
+
+</html>
