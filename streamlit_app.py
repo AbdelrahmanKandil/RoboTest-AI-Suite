@@ -40,6 +40,29 @@ st.set_page_config(
     }
 )
 
+# Handle Scroll to Top logic on navigation
+if st.session_state.get('scroll_to_top'):
+    st.markdown('<div id="top-anchor" style="position: absolute; top: 0; left: 0; width: 1px; height: 1px;"></div>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <script>
+            setTimeout(function() {
+                var anchor = document.getElementById("top-anchor");
+                if (anchor) {
+                    anchor.scrollIntoView({behavior: "instant", block: "start", inline: "nearest"});
+                }
+                // Fallback: Reset parent scroll
+                var main = window.parent.document.querySelector("section.main");
+                if (main) {
+                    main.scrollTop = 0;
+                }
+            }, 250);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+    st.session_state.scroll_to_top = False
+
 
 
 
@@ -1717,8 +1740,14 @@ if page == "Home":
             <p>Use the <strong>Test Case Generator</strong> to create test cases from your requirements</p>
         </div>
         """, unsafe_allow_html=True)
-        st.button("Go to Generator", key="nav_gen_btn", use_container_width=True, 
-                 on_click=lambda: st.session_state.update(main_navigation="🧪 Test Case Generator", nav_radio_widget="🧪 Test Case Generator"))
+        st.markdown('''
+        <a href="?page=Test%20Case%20Generator" target="_self" style="
+            display: block; width: 100%; padding: 0.6rem 1rem;
+            background-color: #1976d2; color: white; text-align: center;
+            text-decoration: none; border-radius: 0.5rem; font-weight: 500;
+            border: none; cursor: pointer; margin-top: 10px;
+        ">🤖 Go to Generator</a>
+        ''', unsafe_allow_html=True)
     
     with steps_col2:
         st.markdown("""
@@ -1728,8 +1757,14 @@ if page == "Home":
             <p>Visit <strong>Test Automation</strong> to generate Java Selenium automation code</p>
         </div>
         """, unsafe_allow_html=True)
-        st.button("Go to Automation", key="nav_auto_btn", use_container_width=True,
-                 on_click=lambda: st.session_state.update(main_navigation="🤖 Test Automation", nav_radio_widget="🤖 Test Automation"))
+        st.markdown('''
+        <a href="?page=Test%20Automation" target="_self" style="
+            display: block; width: 100%; padding: 0.6rem 1rem;
+            background-color: #7b1fa2; color: white; text-align: center;
+            text-decoration: none; border-radius: 0.5rem; font-weight: 500;
+            border: none; cursor: pointer; margin-top: 10px;
+        ">⚡ Go to Automation</a>
+        ''', unsafe_allow_html=True)
     
     with steps_col3:
         st.markdown("""
@@ -1739,8 +1774,14 @@ if page == "Home":
             <p>Download your framework and run automated tests in your environment</p>
         </div>
         """, unsafe_allow_html=True)
-        st.button("Go to Test Plan", key="nav_plan_btn", use_container_width=True,
-                 on_click=lambda: st.session_state.update(main_navigation="📋 Test Plan Generator", nav_radio_widget="📋 Test Plan Generator"))
+        st.markdown('''
+        <a href="?page=Test%20Plan%20Generator" target="_self" style="
+            display: block; width: 100%; padding: 0.6rem 1rem;
+            background-color: #388e3c; color: white; text-align: center;
+            text-decoration: none; border-radius: 0.5rem; font-weight: 500;
+            border: none; cursor: pointer; margin-top: 10px;
+        ">🎯 Go to Test Plan</a>
+        ''', unsafe_allow_html=True)
     
     # AI Provider Status
     st.markdown("---")
