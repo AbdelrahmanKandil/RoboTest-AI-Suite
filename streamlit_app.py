@@ -2024,7 +2024,7 @@ elif page == "Test Case Generator":
                                         placeholder="e.g., 'Focus only on the payment gateway scenarios' or 'Ignore the admin panel section'",
                                         height=100)
                 
-                num_cases_quick = st.slider("Number of test cases", 5,10,15,20,30, key="quick_num_brd")
+                num_cases_quick = st.select_slider("Number of test cases", options=[5, 10, 15, 20, 30], value=15, key="quick_num_brd")
                 
                 if st.button("🚀 Generate from Requirements", key="gen_brd_quick", use_container_width=True, disabled=not final_req_content):
                     with st.spinner("Generating test cases from requirements..."):
